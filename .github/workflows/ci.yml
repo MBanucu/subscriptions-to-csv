@@ -23,7 +23,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha || github.ref }}  # Use head SHA for pull_request_target to checkout PR code safely
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5  # Updated to latest version
+      uses: actions/setup-python@v6.1.0  # Latest version as of November 24, 2025
       with:
         python-version: ${{ matrix.python-version }}
 
