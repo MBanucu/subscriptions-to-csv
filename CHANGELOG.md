@@ -15,6 +15,21 @@
 
 # Changelog
 
+## 1.3.1 (2026-01-18)
+
+## [1.3.1](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.3.0...v1.3.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* reorder publish workflow to create GitHub releases before PyPI ([5239b1a](https://github.com/MBanucu/subscriptions-to-csv/commit/5239b1a9b8889fb2f22dda89ad6892aa1bfd695f))
+
+
+
+
+
+# Changelog
+
 ## 1.3.0 (2026-01-18)
 
 # [1.3.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.2.1...v1.3.0) (2026-01-18)
