@@ -133,26 +133,3 @@ jobs:
         echo "Enabling auto-merge for PR #$PR_NUMBER"
         gh pr merge $PR_NUMBER --auto
 
-    - name: Build package (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
-      run: |
-        python -m pip install --upgrade pip
-        pip install build
-        python -m build
-
-    - name: Publish to PyPI (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        print-hash: true
-
-    - name: Create GitHub release (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        NOTES="${{ steps.semantic.outputs.new_release_notes }}"
-        if [ -z "$NOTES" ]; then
-          NOTES="Release ${{ steps.semantic.outputs.new_release_version }}"
-        fi
-        echo "$NOTES" | gh release create v${{ steps.semantic.outputs.new_release_version }} --title "Release ${{ steps.semantic.outputs.new_release_version }}" --notes-file -
