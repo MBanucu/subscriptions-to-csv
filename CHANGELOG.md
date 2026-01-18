@@ -12,6 +12,31 @@
 * enable auto-merge for automatically generated release PRs ([d83289a](https://github.com/MBanucu/subscriptions-to-csv/commit/d83289aaed03170aabe0e48a787644a2fd24a1f6))
 * use default GITHUB_TOKEN for auto-merge operations ([8ca64a1](https://github.com/MBanucu/subscriptions-to-csv/commit/8ca64a1edb77d582d3a2d747cf7d049369bbe0d0))
 * use GH_TOKEN secret instead of default GITHUB_TOKEN for PR operations ([86553d2](https://github.com/MBanucu/subscriptions-to-csv/commit/86553d2b880fe786ac2d92ae2a47438c9b458e40))
+* use git command to check release commit message ([47ecf0a](https://github.com/MBanucu/subscriptions-to-csv/commit/47ecf0af6d7e3317f34c828c0bbceeda3e2358cd))
+
+
+### Features
+
+* add workflow test feature to verify automated release process ([4f53751](https://github.com/MBanucu/subscriptions-to-csv/commit/4f537514a13a847a1ef8482264a244d61ba3e9cc))
+
+
+
+
+
+# Changelog
+
+## 1.5.0 (2026-01-18)
+
+# [1.5.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.4.0...v1.5.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* capture PR number directly from gh pr create output ([b4690d9](https://github.com/MBanucu/subscriptions-to-csv/commit/b4690d9b2edd135488983787a6c0b3523be912a2))
+* close existing PRs and create fresh ones for automated releases ([c440679](https://github.com/MBanucu/subscriptions-to-csv/commit/c44067981353c7fdac184c986e25e4443f4d9b7e))
+* enable auto-merge for automatically generated release PRs ([d83289a](https://github.com/MBanucu/subscriptions-to-csv/commit/d83289aaed03170aabe0e48a787644a2fd24a1f6))
+* use default GITHUB_TOKEN for auto-merge operations ([8ca64a1](https://github.com/MBanucu/subscriptions-to-csv/commit/8ca64a1edb77d582d3a2d747cf7d049369bbe0d0))
+* use GH_TOKEN secret instead of default GITHUB_TOKEN for PR operations ([86553d2](https://github.com/MBanucu/subscriptions-to-csv/commit/86553d2b880fe786ac2d92ae2a47438c9b458e40))
 
 
 ### Features
