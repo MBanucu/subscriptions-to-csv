@@ -3,10 +3,10 @@ name: Publish
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   publish:
-    if: steps.check-release.outputs.is_release == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
