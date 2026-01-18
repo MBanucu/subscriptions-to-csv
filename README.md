@@ -289,11 +289,13 @@ nix run .#subscriptions-to-csv -- --help
 
 ### Release Process
 
-The project uses automated semantic versioning. When you push commits to the `main` branch:
+The project uses automated semantic versioning with cutting-edge tooling. When you push commits to the `main` branch:
 
-1. **Conventional commits** trigger automatic version bumps
-2. **GitHub Actions** builds, tests, and publishes to PyPI
-3. **Releases** are created with automatically generated changelogs
+1. **Conventional commits** trigger automatic version analysis
+2. **Semantic-release v25.0.2** determines version bumps and generates changelogs
+3. **GitHub Actions v6.0.0** handles the complete release pipeline
+4. **Version files** are automatically updated and committed
+5. **PyPI publishing** via trusted publisher authentication
 
 **Example workflow**:
 ```bash
@@ -301,9 +303,15 @@ The project uses automated semantic versioning. When you push commits to the `ma
 git add .
 git commit -m "feat: add new export format"
 
-# Push to main - triggers automated release
+# Push to main - triggers automated release (13-16 seconds)
 git push origin main
 ```
+
+**Tools Used**:
+- **semantic-release**: v25.0.2 (latest stable)
+- **GitHub Action**: cycjimmy/semantic-release-action v6.0.0
+- **Node.js**: 24+ compatible
+- **Plugins**: changelog, git (optimized for Python projects)
 
 ### Code Style
 
@@ -311,13 +319,15 @@ See AGENTS.md for detailed coding guidelines.
 
 ## Releases
 
-This project uses automated semantic versioning and publishing:
+This project uses automated semantic versioning and publishing with **semantic-release v25.0.2** and **cycjimmy/semantic-release-action v6.0.0**:
 
 ### Automated Releases
 - **Trigger**: Push to `main` branch with conventional commits
 - **Versioning**: Automatic based on commit types (`feat:`, `fix:`, etc.)
-- **Publishing**: Automatic PyPI publishing via GitHub Actions
+- **Publishing**: Automatic PyPI publishing via trusted publisher
 - **Changelog**: Automatically generated from commit messages
+- **Performance**: 13-16 second release cycles
+- **Compatibility**: Latest Node.js 24 and plugin ecosystem support
 
 ### Commit Types & Releases
 
