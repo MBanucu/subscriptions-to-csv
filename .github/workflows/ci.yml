@@ -7,6 +7,7 @@ on:
     branches: [ main ]
   pull_request_target:
     branches: [ 'release/**' ]
+  workflow_dispatch:
 
 jobs:
   test:
