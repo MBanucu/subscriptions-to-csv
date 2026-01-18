@@ -101,6 +101,18 @@ The project includes a comprehensive unit test suite using pytest. Tests cover a
 - **Run with verbose output**: `pytest -v`
 - **Run tests matching pattern**: `pytest -k "parse"`
 
+#### Flake Checks
+
+The flake includes automated CLI integration tests that verify the `nix run` commands work correctly:
+
+- **Run flake checks**: `nix flake check` (includes CLI tests)
+- **Run specific checks**:
+  - `nix build .#checks.x86_64-linux.help-test` - Tests `--help` command
+  - `nix build .#checks.x86_64-linux.basic-test` - Tests basic functionality with sample data
+  - `nix build .#checks.x86_64-linux.named-args-test` - Tests named arguments (`--input`/`--output`)
+
+Flake checks ensure CLI functionality documented in README.md actually works and prevent regressions.
+
 #### Test Coverage
 
 The test suite includes:
