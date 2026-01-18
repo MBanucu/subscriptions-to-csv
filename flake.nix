@@ -143,6 +143,28 @@
                 grep -q "Named Test" named_output.csv
                 touch $out
               '';
+
+          # Run pytest test suite
+          pytest-tests =
+            pkgs.runCommand "subscriptions-to-csv-pytest-tests"
+              {
+                nativeBuildInputs = with pkgs.python3Packages; [
+                  self.packages.${system}.subscriptions-to-csv
+                  pytest
+                  # Add other test dependencies if needed
+                ];
+                src = ./.;
+              }
+              ''
+                # Copy source and tests
+                cp -r $src/* .
+                chmod -R u+w .
+
+                # Run pytest
+                python -m pytest tests/ -v
+
+                touch $out
+              '';
         }
       );
     };
