@@ -36,7 +36,7 @@
 
         text = ''
           python3 -c "
-          import sys, json, urllib.request, argparse
+          import sys, json, urllib.request, argparse, csv
 
           # Parse arguments
           parser = argparse.ArgumentParser(description='Convert subscription list to CSV with EUR conversion')
@@ -59,30 +59,40 @@
           with open(args.input, 'r') as f:
               lines = f.readlines()
 
-          # Output CSV
-          total_eur = 0.0
-          with open(args.output, 'w') as out:
-              print('Service,Price,Currency,PriceEUR', file=out)
-              for i in range(0, len(lines), 2):
-                  if i + 1 >= len(lines):
-                      break
-                  service = lines[i].strip()
-                  price_line = lines[i+1].strip().lstrip('\t')
-                  parts = price_line.split()
-                  if not parts:
-                      continue
-                  price_str = parts[0].lstrip('$')
-                  try:
-                      price = float(price_str)
-                  except ValueError:
-                      continue
-                  currency = parts[1] if len(parts) > 1 else '€'
-                  if currency == 'USD':
-                      eur_price = price * rate
-                  else:
-                      eur_price = price
-                  total_eur += eur_price
-                  print(f'\"{service}\",\"{price:.2f}\",\"{currency}\",\"{eur_price:.2f}\"', file=out)
+          # Parse data into Python structure (list of dictionaries)
+          subscriptions = []
+          for i in range(0, len(lines), 2):
+              if i + 1 >= len(lines):
+                  break
+              service = lines[i].strip()
+              price_line = lines[i+1].strip().lstrip('\t')
+              parts = price_line.split()
+              if not parts:
+                  continue
+              price_str = parts[0].lstrip('$')
+              try:
+                  price = float(price_str)
+              except ValueError:
+                  continue
+              currency = parts[1] if len(parts) > 1 else '€'
+              if currency == 'USD':
+                  eur_price = price * rate
+              else:
+                  eur_price = price
+              subscriptions.append({
+                  'Service': service,
+                  'Price': f'{price:.2f}',
+                  'Currency': currency,
+                  'PriceEUR': f'{eur_price:.2f}'
+              })
+
+          # Use CSV library to create CSV
+          total_eur = sum(float(sub['PriceEUR']) for sub in subscriptions)
+          with open(args.output, 'w') as csvfile:
+              fieldnames = ['Service', 'Price', 'Currency', 'PriceEUR']
+              writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+              writer.writeheader()
+              writer.writerows(subscriptions)
 
           print(f'Created {args.output}')
           print('First few lines:')
