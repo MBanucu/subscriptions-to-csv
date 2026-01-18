@@ -90,46 +90,46 @@ jobs:
       run: |
         git push --force origin "${{ steps.create-branch.outputs.branch_name }}"
 
-    - name: Create pull request (if release branch created)
+    - name: Check if PR already exists (if release branch created)
+      id: check-pr
       if: steps.create-branch.outputs.branch_name != ''
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
-        BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
+        BRANCH="${{ steps.create-branch.outputs.branch_name }}"
+        EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq 'length')
+        echo "pr_exists=$EXISTING_PR" >> $GITHUB_OUTPUT
 
-        ## Changes
-        ${{ steps.semantic.outputs.new_release_notes }}
-
-        ---
-        🤖 This PR was automatically created by the release workflow."
-
-        echo "$BODY" | gh pr create \
-          --title "$TITLE" \
-          --body-file - \
-          --base main \
-          --head "${{ steps.create-branch.outputs.branch_name }}"
-
-    - name: Build package (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
-      run: |
-        python -m pip install --upgrade pip
-        pip install build
-        python -m build
-
-    - name: Publish to PyPI (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        print-hash: true
-
-    - name: Create GitHub release (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
+    - name: Create pull request (if release branch created and no PR exists)
+      id: create-pr
+      if: steps.create-branch.outputs.branch_name != '' && steps.check-pr.outputs.pr_exists == '0'
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        NOTES="${{ steps.semantic.outputs.new_release_notes }}"
-        if [ -z "$NOTES" ]; then
-          NOTES="Release ${{ steps.semantic.outputs.new_release_version }}"
-        fi
-        echo "$NOTES" | gh release create v${{ steps.semantic.outputs.new_release_version }} --title "Release ${{ steps.semantic.outputs.new_release_version }}" --notes-file -
+         TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
+         BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
+
+         ## Changes
+         ${{ steps.semantic.outputs.new_release_notes }}
+
+         ---
+         🤖 This PR was automatically created by the release workflow."
+
+         PR_NUMBER=$(echo "$BODY" | gh pr create \
+           --title "$TITLE" \
+           --body-file - \
+           --base main \
+           --head "${{ steps.create-branch.outputs.branch_name }}" \
+           --json number --jq '.number')
+
+         echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+    - name: Enable auto-merge for PR
+      if: "steps.create-branch.outputs.branch_name != '' && steps.check-pr.outputs.pr_exists == '0'"
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
+        echo "Enabling auto-merge for PR #$PR_NUMBER"
+        gh pr merge $PR_NUMBER --auto
+
