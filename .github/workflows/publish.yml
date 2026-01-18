@@ -31,18 +31,82 @@ jobs:
         pip install build
         python -m build
 
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        print-hash: true
+    - name: Generate release notes
+      id: release-notes
+      run: |
+        # Generate release notes from changelog or recent commits
+        if [ -f CHANGELOG.md ]; then
+          # Try to extract version-specific notes from changelog
+          NOTES=$(sed -n "/## ${{ steps.extract-version.outputs.version }}/,/^## /p" CHANGELOG.md | head -n -1)
+          if [ -z "$NOTES" ]; then
+            # Fallback to recent changelog entries
+            NOTES=$(head -30 CHANGELOG.md)
+          fi
+        else
+          # Fallback to recent commit messages
+          NOTES=$(git log --oneline -10 --grep="feat:\|fix:\|docs:\|chore:" | head -10)
+        fi
+
+        # Escape newlines for GitHub API
+        NOTES_ESCAPED=$(echo "$NOTES" | sed ':a;N;$!ba;s/\n/\\n/g')
+        echo "notes=$NOTES_ESCAPED" >> $GITHUB_OUTPUT
 
     - name: Create GitHub release
+      id: create-release
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        # Generate release notes from changelog or commit
-        NOTES=$(git log --oneline -1)
-        if [ -f CHANGELOG.md ]; then
-          NOTES=$(head -20 CHANGELOG.md | grep -A 10 "## ${{ steps.extract-version.outputs.version }}")
+        echo "Creating GitHub release v${{ steps.extract-version.outputs.version }}..."
+
+        # Create the release with generated notes
+        RELEASE_URL=$(gh release create v${{ steps.extract-version.outputs.version }} \
+          --title "Release v${{ steps.extract-version.outputs.version }}" \
+          --notes "${{ steps.release-notes.outputs.notes }}" \
+          --json url \
+          -q ".url")
+
+        echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
+        echo "✅ GitHub release created: $RELEASE_URL"
+
+    - name: Publish to PyPI
+      id: pypi-publish
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        print-hash: true
+      continue-on-error: true
+
+    - name: Handle PyPI publish result
+      if: always() && steps.pypi-publish.outcome == 'failure'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        echo "❌ PyPI publish failed. Adding warning to GitHub release..."
+
+        # Create updated release notes with warning
+        UPDATED_NOTES="${{ steps.release-notes.outputs.notes }}
+
+        ---
+        ⚠️ **Warning**: PyPI publication failed for this release. The package may not be available for installation via pip. Please check the workflow logs and retry the publication manually if needed."
+
+        # Edit the release to add the warning
+        echo "$UPDATED_NOTES" | gh release edit v${{ steps.extract-version.outputs.version }} \
+          --notes-file -
+
+        echo "✅ Warning added to GitHub release"
+
+    - name: Verify PyPI publication
+      if: steps.pypi-publish.outcome == 'success'
+      run: |
+        echo "✅ PyPI publish completed. Verifying package availability..."
+
+        # Wait a moment for PyPI to process the upload
+        sleep 10
+
+        # Check if the package is available on PyPI
+        if curl -s "https://pypi.org/pypi/subscriptions-to-csv/${{ steps.extract-version.outputs.version }}/json" > /dev/null; then
+          echo "✅ Package verified on PyPI"
+          echo "Release v${{ steps.extract-version.outputs.version }} is now available on both GitHub and PyPI"
+        else
+          echo "⚠️ Package upload reported success but verification failed. This may be due to PyPI processing delays."
+          echo "Please manually verify at: https://pypi.org/project/subscriptions-to-csv/${{ steps.extract-version.outputs.version }}/"
         fi
-        gh release create v${{ steps.extract-version.outputs.version }} --title "Release ${{ steps.extract-version.outputs.version }}" --notes "$NOTES"
