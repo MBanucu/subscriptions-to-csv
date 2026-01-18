@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4  # Updated to latest stable version (v4)
+      uses: actions/checkout@v6.0.2  # Latest version as of January 9, 2026
       with:
         ref: ${{ github.event.pull_request.head.sha || github.ref }}  # Use head SHA for pull_request_target to checkout PR code safely
 
