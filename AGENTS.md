@@ -532,22 +532,51 @@ gh release create v1.2.3 --generate-notes
 - Uses semantic-release v25.0.2 (latest stable)
 - Follows conventional commits specification v1.0.0
 
-**Monitoring Releases**:
-To watch the automated release process in real-time:
+**Monitoring CI/CD Pipeline**:
+To watch the complete automated CI/CD pipeline (tests + releases):
 
 ```bash
-# List recent workflow runs
+# 1. List recent workflow runs (shows both CI and Release)
 gh run list --limit 5
 
-# Watch the latest workflow run
-gh run watch $(gh run list --limit 1 --json databaseId -q '.[0].databaseId')
+# 2. Watch CI workflow completion (runs first)
+gh run watch $(gh run list --workflow=ci.yml --limit 1 --json databaseId -q '.[0].databaseId')
 
-# View detailed logs of a failed run
-gh run view <run-id> --log
+# 3. Watch Release workflow (triggers after CI success)
+gh run watch $(gh run list --workflow=release.yml --limit 1 --json databaseId -q '.[0].databaseId')
 
-# Check release status
-gh release list --limit 3
+# 4. Monitor both workflows in sequence (recommended)
+CI_RUN=$(gh run list --workflow=ci.yml --limit 1 --json databaseId -q '.[0].databaseId')
+echo "Watching CI workflow..."
+gh run watch $CI_RUN
+echo "CI completed! Watching Release workflow..."
+RELEASE_RUN=$(gh run list --workflow=release.yml --limit 1 --json databaseId -q '.[0].databaseId')
+gh run watch $RELEASE_RUN
+
+# 5. Check final status
+gh release list --limit 1
+python3 -c "import urllib.request, json; print('PyPI:', json.load(urllib.request.urlopen('https://pypi.org/pypi/subscriptions-to-csv/json'))['info']['version'])"
+
+# 6. Debug failed workflows
+gh run view <failed-run-id> --log | grep -A 5 -B 5 "error\|Error\|ERROR"
 ```
+
+**Workflow Execution Flow:**
+1. **Push to main** → CI workflow starts automatically
+2. **CI runs tests** (pytest) → 12-15 seconds
+3. **CI success** → Release workflow triggers automatically
+4. **Release analyzes commits** → Creates version bump + changelog
+5. **Release builds & publishes** → PyPI + GitHub release
+
+**Expected Timeline:**
+- CI: ~12-15 seconds (if tests pass)
+- Release: ~13-16 seconds (if triggered)
+- Total: ~25-30 seconds for full pipeline
+
+**Common Monitoring Scenarios:**
+- ✅ **Normal flow**: CI passes → Release triggers → Success
+- ⚠️ **Tests fail**: CI fails → No release → Fix and retry
+- ❌ **Release fails**: CI passes → Release fails → Check PyPI auth/logs
 
 The release workflow typically completes in 13-16 seconds and includes:
 - Semantic release analysis
