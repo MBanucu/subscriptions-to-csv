@@ -7,7 +7,8 @@ from unittest.mock import patch, mock_open
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from main import parse_arguments, fetch_exchange_rate, parse_subscription_data, write_csv_file
+from subscriptions_to_csv import fetch_exchange_rate, parse_subscription_data, write_csv_file
+from subscriptions_to_csv.cli import parse_arguments
 
 
 class TestParseArguments:
@@ -65,21 +66,21 @@ class TestParseSubscriptionData:
 
     def test_parse_basic_eur_subscription(self):
         """Test parsing EUR subscription."""
-        lines = ['Spotify', '12.99 €']
+        content = 'Spotify\n12.99 €'
         rate = 0.85
-        subscriptions = parse_subscription_data(lines, rate)
+        subscriptions = parse_subscription_data(content, rate)
 
         assert len(subscriptions) == 1
         assert subscriptions[0]['Service'] == 'Spotify'
         assert subscriptions[0]['Price'] == '12.99'
-        assert subscriptions[0]['Currency'] == '€'
+        assert subscriptions[0]['Currency'] == 'EUR'
         assert subscriptions[0]['PriceEUR'] == '12.99'
 
     def test_parse_usd_subscription(self):
         """Test parsing USD subscription with conversion."""
-        lines = ['Service', '10.00 USD']
+        content = 'Service\n10.00 USD'
         rate = 0.85
-        subscriptions = parse_subscription_data(lines, rate)
+        subscriptions = parse_subscription_data(content, rate)
 
         assert len(subscriptions) == 1
         assert subscriptions[0]['Service'] == 'Service'
@@ -89,22 +90,23 @@ class TestParseSubscriptionData:
 
     def test_parse_subscription_without_currency(self):
         """Test parsing subscription without explicit currency (defaults to EUR)."""
-        lines = ['Netflix', '19.99']
+        content = 'Netflix\n19.99'
         rate = 0.85
-        subscriptions = parse_subscription_data(lines, rate)
+        subscriptions = parse_subscription_data(content, rate)
 
         assert len(subscriptions) == 1
-        assert subscriptions[0]['Currency'] == '€'
+        assert subscriptions[0]['Currency'] == 'EUR'
 
     def test_parse_multiple_subscriptions(self):
         """Test parsing multiple subscriptions."""
-        lines = [
-            'Spotify', '12.99 €',
-            'Netflix', '19.99 USD',
-            'Amazon', '15.00'
-        ]
+        content = '''Spotify
+12.99 €
+Netflix
+19.99 USD
+Amazon
+15.00'''
         rate = 0.85
-        subscriptions = parse_subscription_data(lines, rate)
+        subscriptions = parse_subscription_data(content, rate)
 
         assert len(subscriptions) == 3
         assert subscriptions[0]['Service'] == 'Spotify'
@@ -113,25 +115,25 @@ class TestParseSubscriptionData:
 
     def test_skip_invalid_price(self):
         """Test skipping subscriptions with invalid prices."""
-        lines = [
-            'Valid Service', '10.99 €',
-            'Invalid Service', 'invalid_price €'
-        ]
+        content = '''Valid Service
+10.99 €
+Invalid Service
+invalid_price €'''
         rate = 0.85
-        subscriptions = parse_subscription_data(lines, rate)
+        subscriptions = parse_subscription_data(content, rate)
 
         assert len(subscriptions) == 1
         assert subscriptions[0]['Service'] == 'Valid Service'
 
     def test_skip_empty_lines(self):
         """Test handling of empty or malformed lines."""
-        lines = [
-            'Service1', '10.99 €',
-            '', '',
-            'Service2', '15.00 USD'
-        ]
+        content = '''Service1
+10.99 €
+
+Service2
+15.00 USD'''
         rate = 0.85
-        subscriptions = parse_subscription_data(lines, rate)
+        subscriptions = parse_subscription_data(content, rate)
 
         assert len(subscriptions) == 2
 
@@ -212,13 +214,13 @@ Netflix
 
     try:
         # Mock the exchange rate
-        with patch('main.fetch_exchange_rate', return_value=0.85):
+        with patch('subscriptions_to_csv.fetch_exchange_rate', return_value=0.85):
             # Read input
             with open(input_filename, 'r') as f:
-                lines = f.readlines()
+                content = f.read()
 
             rate = 0.85
-            subscriptions = parse_subscription_data(lines, rate)
+            subscriptions = parse_subscription_data(content, rate)
             total_eur = write_csv_file(subscriptions, output_filename)
 
             assert len(subscriptions) == 2

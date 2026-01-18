@@ -1,20 +1,39 @@
 # Subscriptions to CSV
 
-A Python package built as a Nix flake utility to convert a subscription list into a CSV file with EUR conversions and totals. Includes a comprehensive test suite for reliable development.
+A Python package built as a Nix flake utility that provides both CLI and library functionality to convert subscription lists into CSV files with EUR conversions and totals. Includes comprehensive type hints, error handling, and a full test suite.
 
 ## Description
 
-This tool processes a text file containing subscription services and their prices, generates a CSV with columns for Service, Price, Currency, and Price in EUR (with automatic USD to EUR conversion), and calculates the total sum in EUR. The project includes comprehensive unit tests covering all major functionality.
+This tool processes subscription data (from files or strings) containing service names and prices, generates CSV output with columns for Service, Price, Currency, and Price in EUR (with automatic USD to EUR conversion), and calculates total sums in EUR.
+
+Available as both:
+- **Command-line tool**: Process files directly from the terminal
+- **Python library**: Import and use programmatically in your applications
+
+The project includes comprehensive unit tests covering all major functionality and supports PyPI distribution.
 
 ## Installation
 
+### Option 1: PyPI (Library + CLI)
+
+```bash
+pip install subscriptions-to-csv
+```
+
+This installs both the command-line tool and Python library.
+
+### Option 2: Nix Flake (Development/Direct Usage)
+
 Ensure you have Nix installed with flakes enabled.
 
-### Option 1: Clone the Repository
+#### Clone the Repository
 
-Clone or download this repository to use locally.
+```bash
+git clone https://github.com/MBanucu/subscriptions-to-csv.git
+cd subscriptions-to-csv
+```
 
-### Option 2: Direct from GitHub
+#### Direct from GitHub
 
 You can also use this flake directly from GitHub without cloning:
 
@@ -35,7 +54,9 @@ This approach allows you to use the tool immediately without downloading the sou
 
 ## Usage
 
-### Basic Usage
+### CLI Usage
+
+#### Basic Usage
 
 ```bash
 # Enter the development shell
@@ -71,6 +92,47 @@ nix run .#subscriptions-to-csv -- --help
 ```
 
 Note: The `--` separates nix arguments from application arguments.
+
+## Library Usage
+
+When installed via pip, you can use the package as a Python library:
+
+### Basic Usage
+
+```python
+from subscriptions_to_csv import convert_subscriptions
+
+# Convert from string data
+data = """Netflix
+$15.99 USD
+Spotify
+€9.99"""
+
+subscriptions, total = convert_subscriptions(data)
+print(f"Total: €{total:.2f}")
+for sub in subscriptions:
+    print(f"{sub['Service']}: {sub['Price']} {sub['Currency']} = €{sub['PriceEUR']}")
+```
+
+### Advanced Usage
+
+```python
+from subscriptions_to_csv import SubscriptionConverter, fetch_exchange_rate
+
+# Manual control over exchange rates
+converter = SubscriptionConverter()
+converter.set_exchange_rate(0.85)  # Set custom rate
+
+# Convert and get data
+subscriptions = converter.convert("Netflix\n$15.99 USD")
+total, count = converter.convert_with_total("Netflix\n$15.99 USD")
+
+# Write to CSV file
+converter.convert_to_csv("Netflix\n$15.99 USD", "output.csv")
+
+# Individual functions
+rate = fetch_exchange_rate()
+```
 
 ## Input Format
 
@@ -135,7 +197,13 @@ The project includes comprehensive unit tests covering:
 
 ## Requirements
 
-- Nix with flakes support
+### CLI Usage
+- Nix with flakes support (for nix-based installation)
+- Internet connection for exchange rate fetching
+
+### Library Usage
+- Python 3.6+ (3.13 recommended)
+- pip for installation
 - Internet connection for exchange rate fetching
 
 ## Development
@@ -144,7 +212,10 @@ The project includes comprehensive unit tests covering:
 
 The project is structured as a proper Python package:
 
-- `main.py`: Main Python application with all functionality
+- `subscriptions_to_csv/`: Main Python package
+  - `__init__.py`: Package initialization and exports
+  - `converter.py`: Core conversion functions and classes
+  - `cli.py`: Command-line interface
 - `pyproject.toml`: Python package configuration and build system
 - `flake.nix`: Nix flake configuration for multi-platform builds
 - `tests/test_main.py`: Comprehensive unit test suite
@@ -211,8 +282,9 @@ See AGENTS.md for detailed coding guidelines.
 2. Create a feature branch
 3. Make changes
 4. Run tests: `nix develop && pytest`
-5. Test manually: `nix run .#subscriptions-to-csv`
-6. Submit a pull request
+5. Test CLI: `nix run .#subscriptions-to-csv -- --help`
+6. Test library: `python3 -c "from subscriptions_to_csv import convert_subscriptions; print('Library works')"`
+7. Submit a pull request
 
 ## License
 

@@ -5,12 +5,13 @@ This file provides guidelines and commands for agentic coding agents working on 
 ## Overview
 
 This project is a Nix flake containing:
-- A Python package (`main.py`) with proper packaging using `pyproject.toml`
-- Exchange rate fetching from API
-- CSV generation with EUR conversions
-- Total sum calculation
+- A Python package (`subscriptions_to_csv/`) with proper packaging using `pyproject.toml`
+- Dual CLI and library support for PyPI publishing
+- Exchange rate fetching from API with fallback handling
+- CSV generation with EUR conversions and totals
 - Comprehensive unit test suite (`tests/test_main.py`)
-- Python package built with `buildPythonPackage` for proper distribution
+- Full type hints and proper error handling
+- Python package built with `buildPythonPackage` for distribution
 - Multi-architecture support (Linux x86_64/aarch64, macOS x86_64/aarch64)
 
 ## Project Structure
@@ -20,7 +21,10 @@ This project is a Nix flake containing:
 ├── flake.nix          # Nix flake configuration (multi-arch support)
 ├── flake.lock         # Nix flake lock file
 ├── pyproject.toml     # Python package configuration
-├── main.py            # Main Python application
+├── subscriptions_to_csv/  # Python package directory
+│   ├── __init__.py    # Package initialization and exports
+│   ├── converter.py   # Core conversion functions and classes
+│   └── cli.py         # Command-line interface
 ├── tests/             # Test directory
 │   ├── test_main.py   # Unit tests
 │   └── README.md      # Test documentation
@@ -77,6 +81,62 @@ nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#subscriptions-to
 ```
 
 **Note**: When using `nix run` with remote flakes, use the `--` separator before long-form options (`--input`, `--output`) to ensure proper argument parsing. If the package isn't found, refresh the cache with: `nix flake metadata --refresh github:MBanucu/subscriptions-to-csv`
+
+## Library Usage
+
+The package can be used as a Python library for programmatic access to subscription conversion functionality.
+
+### Installation
+
+```bash
+pip install subscriptions-to-csv
+```
+
+### Basic Usage
+
+```python
+from subscriptions_to_csv import convert_subscriptions
+
+# Convert from string data
+data = """Netflix
+$15.99 USD
+Spotify
+€9.99"""
+
+subscriptions, total = convert_subscriptions(data)
+print(f"Total: €{total:.2f}")
+for sub in subscriptions:
+    print(f"{sub['Service']}: {sub['Price']} {sub['Currency']} = €{sub['PriceEUR']}")
+```
+
+### Advanced Usage
+
+```python
+from subscriptions_to_csv import SubscriptionConverter, fetch_exchange_rate
+
+# Manual control over exchange rates
+converter = SubscriptionConverter()
+converter.set_exchange_rate(0.85)  # Set custom rate
+
+subscriptions = converter.convert("Netflix\n$15.99 USD")
+total, count = converter.convert_with_total("Netflix\n$15.99 USD")
+
+# Write to CSV file
+converter.convert_to_csv("Netflix\n$15.99 USD", "output.csv")
+
+# Individual functions
+rate = fetch_exchange_rate()
+parsed = parse_subscription_data("Netflix\n$15.99 USD", rate)
+write_csv_file(parsed, "output.csv")
+```
+
+### API Reference
+
+- `convert_subscriptions(content, output_file=None, exchange_rate=None)` - Main conversion function
+- `fetch_exchange_rate()` - Fetch current USD to EUR exchange rate
+- `parse_subscription_data(content, rate)` - Parse subscription data into dictionaries
+- `write_csv_file(subscriptions, output_file)` - Write subscriptions to CSV file
+- `SubscriptionConverter` - Class for advanced usage with state management
 
 ## Build/Lint/Test Commands
 
@@ -228,7 +288,7 @@ Example:
 - Use `with pkgs;` sparingly, prefer explicit imports
 - Pin versions through flake inputs
 
-### Python (main.py)
+### Python (subscriptions_to_csv/)
 
 #### Imports
 - Import standard library modules first
@@ -469,10 +529,11 @@ When making changes:
 7. Update this file if adding new patterns or tools
 
 Recent refactoring examples:
-- **Python packaging**: Converted from shell wrapper to proper Python package using `pyproject.toml` and `buildPythonPackage` for better distribution and packaging practices
+- **Python packaging**: Converted from single-file script to proper Python package using `pyproject.toml` and `buildPythonPackage` for better distribution and packaging practices
 - **Multi-architecture support**: Updated flake.nix to support x86_64/aarch64 Linux and macOS using `forAllSystems`
-- **Code organization**: Extracted Python code from inline flake.nix string to separate `main.py` file with proper function structure for better maintainability and testability
-- **Test suite**: Added comprehensive pytest test suite covering all major functionality
+- **Code organization**: Refactored `main.py` into `subscriptions_to_csv/` package with separate `converter.py`, `cli.py`, and `__init__.py` modules for better maintainability and testability
+- **Library support**: Added dual CLI and library API with type hints and proper error handling for PyPI publishing
+- **Test suite**: Updated comprehensive pytest test suite to work with new package structure while maintaining all functionality
 - **Data processing**: Separated data parsing from CSV output generation by storing subscription data in Python data structures first, then using `csv.DictWriter` for proper formatting
 
 For new features:
