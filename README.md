@@ -321,6 +321,8 @@ See AGENTS.md for detailed coding guidelines.
 
 This project uses automated semantic versioning and publishing with **semantic-release v25.0.2** and **cycjimmy/semantic-release-action v6.0.0**:
 
+🎉 **Fully automated release system now active!**
+
 ### Automated Releases
 - **Trigger**: Push to `main` branch with conventional commits
 - **Versioning**: Automatic based on commit types (`feat:`, `fix:`, etc.)
