@@ -30,11 +30,13 @@
               gawk
               coreutils
               python3Packages.pytest
+              self.packages.${system}.subscriptions-to-csv
             ];
 
             shellHook = ''
-              echo "You can now run:  subscriptions-to-csv"
-              echo "Run tests with: pytest"
+              export PATH="$PATH:${self.packages.${system}.subscriptions-to-csv}/bin"
+              echo "You can now run: subscriptions-to-csv"
+              echo "Run tests with:  pytest"
             '';
           };
         }
