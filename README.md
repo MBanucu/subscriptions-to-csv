@@ -31,7 +31,12 @@ Ensure you have Nix installed with flakes enabled.
 ```bash
 git clone https://github.com/MBanucu/subscriptions-to-csv.git
 cd subscriptions-to-csv
+
+# Allow direnv to load the .envrc file (one-time setup)
+direnv allow
 ```
+
+The project uses [direnv](https://direnv.net/) for automatic development environment loading. After running `direnv allow`, the Nix devShell will be automatically activated whenever you enter the directory.
 
 #### Direct from GitHub
 
@@ -59,7 +64,7 @@ This approach allows you to use the tool immediately without downloading the sou
 #### Basic Usage
 
 ```bash
-# Enter the development shell
+# Enter the development shell (or use direnv for automatic loading)
 nix develop
 
 # Run the converter
@@ -67,6 +72,8 @@ subscriptions-to-csv
 ```
 
 This will read `subscriptions.txt` and output `subscriptions.csv`.
+
+**Note**: If you have direnv installed, the development shell will be automatically activated when you enter the directory, making the `nix develop` step unnecessary.
 
 ### Custom Files
 
@@ -212,12 +219,14 @@ The project includes comprehensive unit tests covering:
 
 The project is structured as a proper Python package:
 
+- `flake.nix`: Nix flake configuration for multi-platform builds
+- `flake.lock`: Nix flake lock file
+- `.envrc`: Direnv configuration for automatic devShell loading
+- `pyproject.toml`: Python package configuration and build system
 - `subscriptions_to_csv/`: Main Python package
   - `__init__.py`: Package initialization and exports
   - `converter.py`: Core conversion functions and classes
   - `cli.py`: Command-line interface
-- `pyproject.toml`: Python package configuration and build system
-- `flake.nix`: Nix flake configuration for multi-platform builds
 - `tests/test_main.py`: Comprehensive unit test suite
 
 ### Building
@@ -235,7 +244,10 @@ This creates a proper Python package using `buildPythonPackage` that can be inst
 Run the comprehensive test suite including CLI integration tests:
 
 ```bash
-# Run unit tests
+# Run unit tests (direnv automatically loads environment)
+pytest
+
+# Or manually enter devShell and run tests
 nix develop --command pytest
 
 # Run flake checks (includes CLI functionality tests)
@@ -255,7 +267,10 @@ The flake checks verify that:
 ### Testing
 
 ```bash
-# Run the test suite
+# Run the test suite (environment loads automatically with direnv)
+pytest
+
+# Or enter devShell manually
 nix develop
 pytest
 
@@ -281,7 +296,7 @@ See AGENTS.md for detailed coding guidelines.
 1. Fork the repository
 2. Create a feature branch
 3. Make changes
-4. Run tests: `nix develop && pytest`
+4. Run tests: `pytest` (direnv automatically loads the environment)
 5. Test CLI: `nix run .#subscriptions-to-csv -- --help`
 6. Test library: `python3 -c "from subscriptions_to_csv import convert_subscriptions; print('Library works')"`
 7. Submit a pull request

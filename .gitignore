@@ -134,3 +134,5 @@ dmypy.json
 # Nix
 result
 result-*
+.direnv/
+.envrc.local

@@ -20,6 +20,7 @@ This project is a Nix flake containing:
 .
 ├── flake.nix          # Nix flake configuration (multi-arch support)
 ├── flake.lock         # Nix flake lock file
+├── .envrc             # Direnv configuration for automatic devShell loading
 ├── pyproject.toml     # Python package configuration
 ├── subscriptions_to_csv/  # Python package directory
 │   ├── __init__.py    # Package initialization and exports
@@ -144,7 +145,7 @@ write_csv_file(parsed, "output.csv")
 
 - **Build the flake**: `nix build`
 - **Run the application**: `nix run .#subscriptions-to-csv`
-- **Enter development shell**: `nix develop`
+- **Enter development shell**: `nix develop` (or use direnv for automatic loading)
 - **Check flake validity**: `nix flake check`
 - **Update flake inputs**: `nix flake update`
 - **Show flake outputs**: `nix flake show`
@@ -155,7 +156,7 @@ The project includes a comprehensive unit test suite using pytest. Tests cover a
 
 #### Running Tests
 
-- **Run all tests**: `nix develop` then `pytest`
+- **Run all tests**: `pytest` (in devShell, activated automatically with direnv)
 - **Run specific test file**: `pytest tests/test_main.py`
 - **Run specific test**: `pytest tests/test_main.py::TestParseArguments::test_default_arguments`
 - **Run with verbose output**: `pytest -v`
@@ -520,15 +521,17 @@ No Copilot rules (.github/copilot-instructions.md) found in this repository.
 
 When making changes:
 
-1. Always test with `nix run .#subscriptions-to-csv` after modifications, including testing CLI options like `--help`, `--input`, and `--output`
-2. Test with named options: `nix run .#subscriptions-to-csv -- --input subscriptions.txt --output test.csv`
-3. Run the test suite with `pytest` to ensure no regressions
-4. Verify CSV output format remains consistent
-5. Check that exchange rate fetching works
-6. Ensure total calculation is accurate
-7. Update this file if adding new patterns or tools
+1. The project uses direnv for automatic devShell loading - when entering the directory, the Nix devShell environment is automatically activated if direnv is installed
+2. Always test with `nix run .#subscriptions-to-csv` after modifications, including testing CLI options like `--help`, `--input`, and `--output`
+3. Test with named options: `nix run .#subscriptions-to-csv -- --input subscriptions.txt --output test.csv`
+4. Run the test suite with `pytest` to ensure no regressions (available automatically in devShell)
+5. Verify CSV output format remains consistent
+6. Check that exchange rate fetching works
+7. Ensure total calculation is accurate
+8. Update this file if adding new patterns or tools
 
 Recent refactoring examples:
+- **Environment management**: Added `.envrc` file with direnv support for automatic devShell loading when entering the directory
 - **Python packaging**: Converted from single-file script to proper Python package using `pyproject.toml` and `buildPythonPackage` for better distribution and packaging practices
 - **Multi-architecture support**: Updated flake.nix to support x86_64/aarch64 Linux and macOS using `forAllSystems`
 - **Code organization**: Refactored `main.py` into `subscriptions_to_csv/` package with separate `converter.py`, `cli.py`, and `__init__.py` modules for better maintainability and testability
