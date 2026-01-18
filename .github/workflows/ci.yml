@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main, 'release/**' ]
+    branches: [ main ]
   pull_request_target:
     branches: [ 'release/**' ]
   workflow_dispatch:
@@ -18,12 +18,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4  # Updated to latest stable version (v4)
       with:
-        ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.ref || github.ref }}
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}  # Use head SHA for pull_request_target to checkout PR code safely
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5  # Updated to latest version
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.13'
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v4  # Updated to latest version
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
