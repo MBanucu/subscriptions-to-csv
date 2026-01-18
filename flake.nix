@@ -61,6 +61,11 @@
 
             propagatedBuildInputs = with pkgs.python3Packages; [ ];
 
+            # Remove cached bytecode to avoid issues
+            postInstall = ''
+              find $out -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+            '';
+
             meta = with pkgs.lib; {
               description = "Convert subscription list to CSV with EUR conversion";
               license = licenses.mit;

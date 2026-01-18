@@ -12,6 +12,20 @@ def parse_arguments():
         description='Convert subscription list to CSV with EUR conversion',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+Input File Format:
+Each subscription consists of 2 lines:
+  Line 1: Service name (e.g., "Netflix")
+  Line 2: Price with currency, optionally preceded by tabs/spaces (e.g., "$15.99 USD" or "€9.99")
+
+Example input file format:
+Netflix
+\t12.99 €
+Spotify
+\t9.99 €
+
+Supported currencies: USD ($), EUR (€)
+All prices are converted to EUR in the output CSV.
+
 Examples:
   subscriptions-to-csv subscriptions.txt output.csv
   subscriptions-to-csv --input subscriptions.txt --output output.csv
