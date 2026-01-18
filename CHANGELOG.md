@@ -1,3 +1,12 @@
+## [1.1.3](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.2...v1.1.3) (2026-01-18)
+
+
+### Bug Fixes
+
+* add exec plugin to update version files before git commit ([e828fe4](https://github.com/MBanucu/subscriptions-to-csv/commit/e828fe42a8dce39121135cb4a92c5cfe9ed29953))
+* install exec plugin and manually update version files ([2eb456e](https://github.com/MBanucu/subscriptions-to-csv/commit/2eb456ea08a572d5369458bc1aff1dd4e1b84c99))
+* remove problematic exec plugin, use manual version update ([ee857d7](https://github.com/MBanucu/subscriptions-to-csv/commit/ee857d7c9b15860b315fea9a3458e608995108cb))
+
 ## [1.1.2](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.1...v1.1.2) (2026-01-18)
 
 
