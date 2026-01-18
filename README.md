@@ -29,14 +29,24 @@ This will read `subscriptions.txt` and output `subscriptions.csv`.
 ### Custom Files
 
 ```bash
-# Specify input and output files
+# Specify input and output files (positional)
 nix run .#subscriptions-to-csv path/to/input.txt path/to/output.csv
+
+# Or using options
+nix run .#subscriptions-to-csv --input path/to/input.txt --output path/to/output.csv
 ```
 
 ### Direct Run
 
 ```bash
 nix run .#subscriptions-to-csv
+```
+
+### Help
+
+```bash
+# Show usage information
+nix run .#subscriptions-to-csv --help
 ```
 
 ## Input Format
@@ -86,8 +96,8 @@ Total in EUR: 41.60
 
 ## Configuration
 
-- **Input file**: Default `subscriptions.txt`, can be overridden
-- **Output file**: Default `subscriptions.csv`, can be overridden
+- **Input file**: Default `subscriptions.txt`, can be overridden with `--input` or positional argument
+- **Output file**: Default `subscriptions.csv`, can be overridden with `--output` or positional argument
 - **Exchange rate**: Automatically fetched from exchangerate-api.com
 - **Fallback**: If API fails, uses rate 1.0
 
@@ -107,7 +117,12 @@ nix build
 ### Testing
 
 ```bash
+# Run with defaults
 nix run .#subscriptions-to-csv
+
+# Test CLI options
+nix run .#subscriptions-to-csv --help
+
 # Check the output CSV and total
 ```
 

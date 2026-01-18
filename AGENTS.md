@@ -5,10 +5,42 @@ This file provides guidelines and commands for agentic coding agents working on 
 ## Overview
 
 This project is a Nix flake containing:
-- A Python script for processing subscription data
+- A Python script for processing subscription data with command-line argument parsing
 - Exchange rate fetching from API
 - CSV generation with EUR conversions
 - Total sum calculation
+
+## CLI Usage
+
+The application supports command-line arguments for input and output files, with both positional and optional syntax.
+
+### Basic Usage
+
+- **Default**: `nix run .#subscriptions-to-csv` (uses `subscriptions.txt` and `subscriptions.csv`)
+- **Positional**: `nix run .#subscriptions-to-csv input.txt output.csv`
+- **Options**: `nix run .#subscriptions-to-csv --input input.txt --output output.csv`
+- **Help**: `nix run .#subscriptions-to-csv --help`
+
+### Examples
+
+```bash
+# Use default files
+nix run .#subscriptions-to-csv
+
+# Specify input file only
+nix run .#subscriptions-to-csv custom-subscriptions.txt
+
+# Specify both input and output
+nix run .#subscriptions-to-csv subscriptions.txt results.csv
+
+# Using options
+nix run .#subscriptions-to-csv --input ~/data/subscriptions.txt --output ~/exports/subs.csv
+
+# Show help
+nix run .#subscriptions-to-csv -- --help
+```
+
+Note: When running from GitHub (e.g., `nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv`), use `--` to separate nix args from app args for help or options.
 
 ## Build/Lint/Test Commands
 
@@ -28,10 +60,13 @@ There are currently no automated tests in this project. To manually test:
 - Verify output CSV is created correctly
 - Check that EUR conversions use current exchange rates
 - Confirm total sum is calculated accurately
+- Test CLI options: `nix run .#subscriptions-to-csv --help` should display usage information
 
 For manual testing of specific scenarios:
 - Test with different input files: `nix run .#subscriptions-to-csv ./custom-subscriptions.txt`
 - Test output to different file: `nix run .#subscriptions-to-csv subscriptions.txt output.csv`
+- Test options: `nix run .#subscriptions-to-csv --input input.txt --output output.csv`
+- Test remote execution: `nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv --input ~/path/to/file.txt`
 
 ### Linting
 
@@ -163,6 +198,22 @@ except Exception as e:
 - Process files line-by-line for large inputs
 - Use efficient data structures
 
+#### CLI Argument Parsing
+- Use `argparse` from the standard library for command-line interfaces
+- Define positional and optional arguments with clear descriptions
+- Provide sensible defaults for input/output files
+- Support `--help` for usage information
+
+Example:
+```python
+import argparse
+
+parser = argparse.ArgumentParser(description='Process subscription data')
+parser.add_argument('--input', '-i', default='subscriptions.txt', help='Input file')
+parser.add_argument('--output', '-o', default='subscriptions.csv', help='Output file')
+args = parser.parse_args()
+```
+
 ### Bash/Shell Scripting
 
 #### Best Practices
@@ -216,6 +267,7 @@ except Exception as e:
 - Add configuration file support
 - Improve error messages and user feedback
 - Add support for more currencies
+- Enhance CLI with additional options (e.g., currency selection, verbose output)
 
 ## Cursor Rules
 
@@ -229,7 +281,7 @@ No Copilot rules (.github/copilot-instructions.md) found in this repository.
 
 When making changes:
 
-1. Always test with `nix run .#subscriptions-to-csv` after modifications
+1. Always test with `nix run .#subscriptions-to-csv` after modifications, including testing CLI options like `--help`, `--input`, and `--output`
 2. Verify CSV output format remains consistent
 3. Check that exchange rate fetching works
 4. Ensure total calculation is accurate
