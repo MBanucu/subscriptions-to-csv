@@ -5,12 +5,12 @@ This file provides guidelines and commands for agentic coding agents working on 
 ## Overview
 
 This project is a Nix flake containing:
-- A Python script (`main.py`) for processing subscription data with command-line argument parsing
+- A Python package (`main.py`) with proper packaging using `pyproject.toml`
 - Exchange rate fetching from API
 - CSV generation with EUR conversions
 - Total sum calculation
 - Comprehensive unit test suite (`tests/test_main.py`)
-- Wrapper package for improved GitHub flake argument handling
+- Python package built with `buildPythonPackage` for proper distribution
 - Multi-architecture support (Linux x86_64/aarch64, macOS x86_64/aarch64)
 
 ## Project Structure
@@ -19,6 +19,7 @@ This project is a Nix flake containing:
 .
 ├── flake.nix          # Nix flake configuration (multi-arch support)
 ├── flake.lock         # Nix flake lock file
+├── pyproject.toml     # Python package configuration
 ├── main.py            # Main Python application
 ├── tests/             # Test directory
 │   ├── test_main.py   # Unit tests
@@ -415,6 +416,7 @@ When making changes:
 7. Update this file if adding new patterns or tools
 
 Recent refactoring examples:
+- **Python packaging**: Converted from shell wrapper to proper Python package using `pyproject.toml` and `buildPythonPackage` for better distribution and packaging practices
 - **Multi-architecture support**: Updated flake.nix to support x86_64/aarch64 Linux and macOS using `forAllSystems`
 - **Code organization**: Extracted Python code from inline flake.nix string to separate `main.py` file with proper function structure for better maintainability and testability
 - **Test suite**: Added comprehensive pytest test suite covering all major functionality

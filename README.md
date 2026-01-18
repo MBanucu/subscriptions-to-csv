@@ -1,6 +1,6 @@
 # Subscriptions to CSV
 
-A simple Nix flake utility to convert a subscription list into a CSV file with EUR conversions and totals. Includes a comprehensive test suite for reliable development.
+A Python package built as a Nix flake utility to convert a subscription list into a CSV file with EUR conversions and totals. Includes a comprehensive test suite for reliable development.
 
 ## Description
 
@@ -140,11 +140,24 @@ The project includes comprehensive unit tests covering:
 
 ## Development
 
+### Project Structure
+
+The project is structured as a proper Python package:
+
+- `main.py`: Main Python application with all functionality
+- `pyproject.toml`: Python package configuration and build system
+- `flake.nix`: Nix flake configuration for multi-platform builds
+- `tests/test_main.py`: Comprehensive unit test suite
+
 ### Building
+
+Build the Python package:
 
 ```bash
 nix build
 ```
+
+This creates a proper Python package using `buildPythonPackage` that can be installed and distributed.
 
 ### Testing
 

@@ -46,18 +46,26 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          subscriptions-to-csv = pkgs.writeShellApplication {
-            name = "subscriptions-to-csv";
+          subscriptions-to-csv = pkgs.python3Packages.buildPythonPackage {
+            pname = "subscriptions-to-csv";
+            version = "1.0.0";
+            format = "pyproject";
 
-            runtimeInputs = with pkgs; [
-              python3
-              coreutils
+            src = ./.;
+
+            nativeBuildInputs = with pkgs.python3Packages; [
+              setuptools
             ];
 
-            text = ''
-              python3 main.py "$@"
-            '';
+            propagatedBuildInputs = with pkgs.python3Packages; [ ];
+
+            meta = with pkgs.lib; {
+              description = "Convert subscription list to CSV with EUR conversion";
+              license = licenses.mit;
+              maintainers = [ ];
+            };
           };
+          default = self.packages.${system}.subscriptions-to-csv;
         }
       );
 
