@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.2.0...v1.2.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* make release workflow depend on CI success ([f3eaa9a](https://github.com/MBanucu/subscriptions-to-csv/commit/f3eaa9aae05007112c2e0927377a9bf43718d20e))
+
 # [1.2.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.5...v1.2.0) (2026-01-18)
 
 
