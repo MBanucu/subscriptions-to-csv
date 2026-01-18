@@ -287,9 +287,52 @@ nix run .#subscriptions-to-csv -- --help
 # Check the output CSV and total
 ```
 
+### Release Process
+
+The project uses automated semantic versioning. When you push commits to the `main` branch:
+
+1. **Conventional commits** trigger automatic version bumps
+2. **GitHub Actions** builds, tests, and publishes to PyPI
+3. **Releases** are created with automatically generated changelogs
+
+**Example workflow**:
+```bash
+# Make changes
+git add .
+git commit -m "feat: add new export format"
+
+# Push to main - triggers automated release
+git push origin main
+```
+
 ### Code Style
 
 See AGENTS.md for detailed coding guidelines.
+
+## Releases
+
+This project uses automated semantic versioning and publishing:
+
+### Automated Releases
+- **Trigger**: Push to `main` branch with conventional commits
+- **Versioning**: Automatic based on commit types (`feat:`, `fix:`, etc.)
+- **Publishing**: Automatic PyPI publishing via GitHub Actions
+- **Changelog**: Automatically generated from commit messages
+
+### Commit Types & Releases
+
+| Commit Type | Release Type | Version Bump | Example |
+|-------------|--------------|--------------|---------|
+| `fix:` | Patch | 0.0.1 | `fix: handle empty files` |
+| `feat:` | Minor | 0.1.0 | `feat: add export formats` |
+| `feat!:` or `BREAKING CHANGE:` | Major | 1.0.0 | `feat!: redesign API` |
+| `docs:`, `refactor:`, `test:`, `chore:` | No release | - | `docs: update README` |
+
+### Manual Releases
+For special cases, create releases manually:
+```bash
+gh release create v1.2.3 --generate-notes
+```
 
 ## Contributing
 

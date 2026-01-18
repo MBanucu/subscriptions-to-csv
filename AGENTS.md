@@ -494,6 +494,40 @@ For complex changes that result in multiple incremental commits (fixes, document
 
 **When to use**: For complex refactors, major feature additions, or when incremental commits become messy.
 
+#### Automated Release Management
+
+The project uses **semantic-release** for automated versioning and publishing based on conventional commit messages.
+
+**Workflow**:
+1. **Commit with conventional format**: Use `feat:`, `fix:`, `docs:`, etc.
+2. **Push to main branch**: Triggers automated release workflow
+3. **Automatic actions**:
+   - Version bump determination (major/minor/patch)
+   - Changelog generation
+   - Git tag creation
+   - GitHub release creation
+   - PyPI package publishing
+
+**Commit Types & Version Bumps**:
+
+| Commit Type | Version Change | Example |
+|-------------|----------------|---------|
+| `fix:` | Patch (0.0.x) | `fix: correct EUR conversion bug` |
+| `feat:` | Minor (0.x.0) | `feat: add new CLI option` |
+| `feat!:` or `BREAKING CHANGE:` | Major (x.0.0) | `feat!: change API completely` |
+| `docs:`, `refactor:`, `test:`, `chore:` | No release | `docs: update README` |
+
+**Manual Releases**:
+For special cases, you can still create releases manually:
+```bash
+gh release create v1.2.3 --generate-notes
+```
+
+**Configuration**:
+- `.github/workflows/release.yml`: GitHub Actions workflow
+- `.releaserc.json`: Semantic release configuration
+- Follows conventional commits specification v1.0.0
+
 ### Dependencies
 
 - Keep runtime dependencies minimal
