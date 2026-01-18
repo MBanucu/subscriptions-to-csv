@@ -75,5 +75,68 @@
           program = "${self.packages.${system}.subscriptions-to-csv}/bin/subscriptions-to-csv";
         };
       });
+
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          # Test that the help command works
+          help-test =
+            pkgs.runCommand "subscriptions-to-csv-help-test"
+              {
+                nativeBuildInputs = [ self.packages.${system}.subscriptions-to-csv ];
+              }
+              ''
+                subscriptions-to-csv --help | grep -q "Convert subscription list to CSV"
+                touch $out
+              '';
+
+          # Test basic functionality with sample data
+          basic-test =
+            pkgs.runCommand "subscriptions-to-csv-basic-test"
+              {
+                nativeBuildInputs = [ self.packages.${system}.subscriptions-to-csv ];
+                # Create a test input file
+                inputData = ''
+                  Test Service
+                  	25.00 €
+                  Another Service
+                  	15.50 USD
+                '';
+              }
+              ''
+                echo "$inputData" > test_input.txt
+                subscriptions-to-csv test_input.txt test_output.csv
+                # Check that output file was created
+                test -f test_output.csv
+                # Check that it contains expected content
+                grep -q "Test Service" test_output.csv
+                grep -q "Another Service" test_output.csv
+                grep -q "25.00" test_output.csv
+                grep -q "15.50" test_output.csv
+                touch $out
+              '';
+
+          # Test named arguments
+          named-args-test =
+            pkgs.runCommand "subscriptions-to-csv-named-args-test"
+              {
+                nativeBuildInputs = [ self.packages.${system}.subscriptions-to-csv ];
+                inputData = ''
+                  Named Test
+                  	10.00 €
+                '';
+              }
+              ''
+                echo "$inputData" > named_input.txt
+                subscriptions-to-csv --input named_input.txt --output named_output.csv
+                test -f named_output.csv
+                grep -q "Named Test" named_output.csv
+                touch $out
+              '';
+        }
+      );
     };
 }
