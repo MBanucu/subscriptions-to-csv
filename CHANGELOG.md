@@ -1,3 +1,11 @@
+## [1.1.4](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.3...v1.1.4) (2026-01-18)
+
+
+### Bug Fixes
+
+* move version file updates to semantic release exec plugin ([59ab1b4](https://github.com/MBanucu/subscriptions-to-csv/commit/59ab1b4884fd3960a74339ebb0913de0f78ef952))
+* remove problematic @semantic-release/exec plugin ([909ec33](https://github.com/MBanucu/subscriptions-to-csv/commit/909ec338d556a1582756125b16302ffc880f6649))
+
 ## [1.1.3](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.2...v1.1.3) (2026-01-18)
 
 
