@@ -1,3 +1,37 @@
+# Changelog
+
+## 1.3.0 (2026-01-18)
+
+# [1.3.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.2.1...v1.3.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* add branch filter to workflow_run trigger ([e9bcebd](https://github.com/MBanucu/subscriptions-to-csv/commit/e9bcebd767597fe657f34c95745f66628c39e4c6))
+* add GH_TOKEN for GitHub CLI in release workflow ([e2b0b15](https://github.com/MBanucu/subscriptions-to-csv/commit/e2b0b151d6878d8a9766f888f894484b0f56eaca))
+* add GH_TOKEN to push release branch step ([aef0a83](https://github.com/MBanucu/subscriptions-to-csv/commit/aef0a83a760922d5c2fcf3bfa49f1a7aaadea769))
+* correct Codecov setup with v5 action and proper parameters ([5998347](https://github.com/MBanucu/subscriptions-to-csv/commit/59983471d7a31a06a1c6edff75da06d2359c9726))
+* enhance release automation with rebase merges and PR updates ([bc9640f](https://github.com/MBanucu/subscriptions-to-csv/commit/bc9640fec7bf4f6e8c47bc12d5b53171224422df))
+* force push release branches to handle existing branches ([c6f00ff](https://github.com/MBanucu/subscriptions-to-csv/commit/c6f00ff6750f7973b17325718a310e18d8da83cd))
+* prevent release workflow from triggering on PR branches ([8c3cc87](https://github.com/MBanucu/subscriptions-to-csv/commit/8c3cc87b9b6092e1a46a18545e47bf00375f003c))
+* remove non-existent label from PR creation ([0282209](https://github.com/MBanucu/subscriptions-to-csv/commit/028220934f33ef0c987facc08624ba027b831350))
+* separate publishing into post-merge workflow ([2e1415e](https://github.com/MBanucu/subscriptions-to-csv/commit/2e1415e04631ca361d413342a9f3b385a7a3caff))
+* temporarily disable Codecov due to OIDC token issues in PR context ([9fbe29a](https://github.com/MBanucu/subscriptions-to-csv/commit/9fbe29a61c6d173ec94fe34c8de97386e2171b9e))
+* temporarily disable Codecov upload ([4f1b99f](https://github.com/MBanucu/subscriptions-to-csv/commit/4f1b99f28603f82bce87494b07258a8e2d38ef86))
+* update license field format for PEP 621 compliance ([c3fbc13](https://github.com/MBanucu/subscriptions-to-csv/commit/c3fbc13f358844f6db2a45898759f4a1d3effe2d))
+
+
+### Features
+
+* add CI success summary job for GitHub ruleset ([c8c7fcf](https://github.com/MBanucu/subscriptions-to-csv/commit/c8c7fcfb6c265b5abce05eef07e2f51709432a16))
+* add Python version matrix to CI ([356878c](https://github.com/MBanucu/subscriptions-to-csv/commit/356878c40b94baad118092758e4a58a3fb5c7333))
+* implement proper Codecov setup with branch coverage ([068b862](https://github.com/MBanucu/subscriptions-to-csv/commit/068b862dd6aa66d5ad49dd0ef647b1ecbb3dddbf))
+* implement release via PR workflow ([f8953ff](https://github.com/MBanucu/subscriptions-to-csv/commit/f8953ff28d80178006a160a6a4c9120c78887f78))
+
+
+
+
+
 ## [1.2.1](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.2.0...v1.2.1) (2026-01-18)
 
 
