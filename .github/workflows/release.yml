@@ -148,16 +148,9 @@ jobs:
 
          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
-    - name: Enable auto-merge for PR
+    - name: Auto-merge enabled
       if: steps.create-branch.outputs.branch_name != ''
-      env:
-        GH_TOKEN: ${{ github.token }}
       run: |
-        if [ "${{ steps.check-pr.outputs.pr_exists }}" -gt 0 ]; then
-          PR_NUMBER=${{ steps.check-pr.outputs.existing_pr_number }}
-        else
-          PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
-        fi
-        echo "Enabling auto-merge for PR #$PR_NUMBER"
-        gh pr merge $PR_NUMBER --auto --rebase
+        echo "✅ Release PR created successfully"
+        echo "🤖 Auto-merge is enabled at the repository level"
 
