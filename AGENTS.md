@@ -373,6 +373,8 @@ with open(args.output, 'w', newline='') as csvfile:
 
 ### Git Workflow
 
+- **Always use conventional commit format**: All commits must follow the Conventional Commits specification v1.0.0
+- **Internalize the specification**: Read and understand https://www.conventionalcommits.org/en/v1.0.0/#specification before crafting any commit message
 - Use conventional commit messages
 - Keep commits focused and atomic
 - Test before committing
