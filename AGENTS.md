@@ -10,12 +10,14 @@ This project is a Nix flake containing:
 - CSV generation with EUR conversions
 - Total sum calculation
 - Comprehensive unit test suite (`tests/test_main.py`)
+- Wrapper package for improved GitHub flake argument handling
+- Multi-architecture support (Linux x86_64/aarch64, macOS x86_64/aarch64)
 
 ## Project Structure
 
 ```
 .
-├── flake.nix          # Nix flake configuration
+├── flake.nix          # Nix flake configuration (multi-arch support)
 ├── flake.lock         # Nix flake lock file
 ├── main.py            # Main Python application
 ├── tests/             # Test directory
@@ -30,14 +32,14 @@ This project is a Nix flake containing:
 
 ## CLI Usage
 
-The application supports command-line arguments for input and output files, with both positional and optional syntax.
+The application supports command-line arguments for input and output files, with both positional and optional syntax. Multiple package variants are available for different use cases.
 
 ### Basic Usage
 
 - **Default**: `nix run .#subscriptions-to-csv` (uses `subscriptions.txt` and `subscriptions.csv`)
 - **Positional**: `nix run .#subscriptions-to-csv input.txt output.csv`
-- **Options**: `nix run .#subscriptions-to-csv --input input.txt --output output.csv`
-- **Help**: `nix run .#subscriptions-to-csv --help`
+- **Wrapper (recommended for GitHub flakes)**: `nix run .#wrapper --input input.txt --output output.csv`
+- **Help**: `nix run .#subscriptions-to-csv -- --help`
 
 ### Examples
 
@@ -48,17 +50,32 @@ nix run .#subscriptions-to-csv
 # Specify input file only
 nix run .#subscriptions-to-csv custom-subscriptions.txt
 
-# Specify both input and output
+# Specify both input and output (positional)
 nix run .#subscriptions-to-csv subscriptions.txt results.csv
 
-# Using options
-nix run .#subscriptions-to-csv --input ~/data/subscriptions.txt --output ~/exports/subs.csv
+# Using wrapper with options (recommended)
+nix run .#wrapper --input ~/data/subscriptions.txt --output ~/exports/subs.csv
 
 # Show help
 nix run .#subscriptions-to-csv -- --help
 ```
 
-Note: When running from GitHub (e.g., `nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv`), use `--` to separate nix args from app args for help or options.
+### GitHub Flake Usage
+
+For running directly from GitHub without cloning:
+
+```bash
+# Basic usage (positional args only)
+nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv subscriptions.txt output.csv
+
+# With wrapper for full option support (after cache refresh)
+nix run github:MBanucu/subscriptions-to-csv#wrapper -- --input subscriptions.txt --output output.csv
+
+# Alternative that bypasses GitHub caching
+nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#wrapper -- --input subscriptions.txt --output output.csv
+```
+
+**Note**: When using `nix run` with remote flakes, long-form options (`--input`, `--output`) may not work due to nix argument parsing. Use positional arguments or the wrapper package for full option support. If the wrapper isn't found, refresh the cache with: `nix flake metadata --refresh github:MBanucu/subscriptions-to-csv`
 
 ## Build/Lint/Test Commands
 
@@ -66,9 +83,11 @@ Note: When running from GitHub (e.g., `nix run github:MBanucu/subscriptions-to-c
 
 - **Build the flake**: `nix build`
 - **Run the application**: `nix run .#subscriptions-to-csv`
+- **Run wrapper**: `nix run .#wrapper --input file.txt --output out.csv`
 - **Enter development shell**: `nix develop`
 - **Check flake validity**: `nix flake check`
 - **Update flake inputs**: `nix flake update`
+- **Show flake outputs**: `nix flake show`
 
 ### Testing
 
@@ -132,15 +151,23 @@ For Nix code:
 ### Nix (flake.nix)
 
 #### File Structure
-- Follow nixpkgs flake template structure
-- Group related outputs together
+- Support multiple architectures using `forAllSystems`
+- Group related outputs together (packages, apps, devShells)
 - Use descriptive let bindings for complex expressions
 
 #### Naming Conventions
-- Use `system` for the target system string
+- Use `systems` list for supported architectures
+- Use `forAllSystems` helper for multi-arch support
 - Use `pkgs` for nixpkgs package set
 - Package names: lowercase-with-dashes
 - Attribute names: camelCase for outputs
+
+#### Multi-Architecture Support
+The flake supports multiple systems:
+- `x86_64-linux` (Linux x86_64)
+- `aarch64-linux` (Linux ARM64)
+- `x86_64-darwin` (macOS x86_64)
+- `aarch64-darwin` (macOS ARM64)
 
 #### Formatting
 - 2-space indentation
@@ -151,13 +178,31 @@ For Nix code:
 Example:
 ```nix
 {
-  packages.${system}.my-package = pkgs.writeShellApplication {
-    name = "my-package";
-    runtimeInputs = with pkgs; [ python3 ];
-    text = ''
-      # script here
-    '';
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
+
+  outputs = { self, nixpkgs, ... }:
+    let
+      systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+    in
+    {
+      packages = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          my-package = pkgs.writeShellApplication {
+            name = "my-package";
+            runtimeInputs = with pkgs; [ python3 ];
+            text = ''
+              # script here
+            '';
+          };
+        }
+      );
+    };
 }
 ```
 
@@ -361,13 +406,16 @@ No Copilot rules (.github/copilot-instructions.md) found in this repository.
 When making changes:
 
 1. Always test with `nix run .#subscriptions-to-csv` after modifications, including testing CLI options like `--help`, `--input`, and `--output`
-2. Run the test suite with `pytest` to ensure no regressions
-3. Verify CSV output format remains consistent
-4. Check that exchange rate fetching works
-5. Ensure total calculation is accurate
-6. Update this file if adding new patterns or tools
+2. Test the wrapper package: `nix run .#wrapper --input subscriptions.txt --output test.csv`
+3. Run the test suite with `pytest` to ensure no regressions
+4. Verify CSV output format remains consistent
+5. Check that exchange rate fetching works
+6. Ensure total calculation is accurate
+7. Update this file if adding new patterns or tools
 
 Recent refactoring examples:
+- **Multi-architecture support**: Updated flake.nix to support x86_64/aarch64 Linux and macOS using `forAllSystems`
+- **Wrapper package**: Added wrapper package for better GitHub flake argument handling
 - **Code organization**: Extracted Python code from inline flake.nix string to separate `main.py` file with proper function structure for better maintainability and testability
 - **Test suite**: Added comprehensive pytest test suite covering all major functionality
 - **Data processing**: Separated data parsing from CSV output generation by storing subscription data in Python data structures first, then using `csv.DictWriter` for proper formatting
