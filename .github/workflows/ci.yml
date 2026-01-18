@@ -9,15 +9,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.12'
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
@@ -27,4 +30,37 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m pytest tests/ -v --cov=subscriptions_to_csv --cov-report=term-missing
+        python -m pytest tests/ -v --cov=subscriptions_to_csv --cov-branch --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.13'
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+  # Summary job that depends on all matrix jobs
+  ci-success:
+    if: always()
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Check matrix test results
+        run: |
+          if [[ ${{ needs.test.result }} == 'success' ]]; then
+            echo "✅ All matrix tests passed!"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Some matrix tests failed"
+            echo "status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: CI Success
+        if: needs.test.result == 'success'
+        run: echo "🎉 CI pipeline completed successfully across all Python versions!"
+
+      - name: CI Failed
+        if: needs.test.result != 'success'
+        run: |
+          echo "💥 CI pipeline failed. Check individual job logs for details."
+          exit 1
