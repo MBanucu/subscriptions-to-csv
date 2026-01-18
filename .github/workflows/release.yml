@@ -107,26 +107,18 @@ jobs:
           echo "existing_pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
         fi
 
-    - name: Update existing PR (if PR exists)
+    - name: Close existing PR (if PR exists)
       if: steps.check-pr.outputs.pr_exists != '0'
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
         PR_NUMBER=${{ steps.check-pr.outputs.existing_pr_number }}
-        TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
-        BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
+        echo "Closing existing PR #$PR_NUMBER to ensure fresh CI triggering..."
+        gh pr close $PR_NUMBER --comment "Closed to create fresh PR with proper CI triggering"
 
-        ## Changes
-        ${{ steps.semantic.outputs.new_release_notes }}
-
-        ---
-        🤖 This PR was automatically updated by the release workflow."
-
-        echo "$BODY" | gh pr edit $PR_NUMBER --title "$TITLE" --body-file -
-
-    - name: Create pull request (if release branch created and no PR exists)
+    - name: Create pull request (always create fresh PR)
       id: create-pr
-      if: steps.create-branch.outputs.branch_name != '' && steps.check-pr.outputs.pr_exists == '0'
+      if: steps.create-branch.outputs.branch_name != ''
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
