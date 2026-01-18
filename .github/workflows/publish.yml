@@ -59,14 +59,11 @@ jobs:
         echo "Creating GitHub release v${{ steps.extract-version.outputs.version }}..."
 
         # Create the release with generated notes
-        RELEASE_URL=$(gh release create v${{ steps.extract-version.outputs.version }} \
+        gh release create v${{ steps.extract-version.outputs.version }} \
           --title "Release v${{ steps.extract-version.outputs.version }}" \
-          --notes "${{ steps.release-notes.outputs.notes }}" \
-          --json url \
-          -q ".url")
+          --notes "${{ steps.release-notes.outputs.notes }}"
 
-        echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
-        echo "✅ GitHub release created: $RELEASE_URL"
+        echo "✅ GitHub release created successfully"
 
     - name: Publish to PyPI
       id: pypi-publish
