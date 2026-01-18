@@ -31,6 +31,12 @@ classifiers = [
 dependencies = []
 keywords = ["csv", "subscriptions", "eur", "conversion", "finance"]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/MBanucu/subscriptions-to-csv"
 
