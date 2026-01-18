@@ -122,3 +122,14 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         print-hash: true
+
+    - name: Create GitHub release (if release created)
+      if: steps.semantic.outputs.new_release_published == 'true'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        NOTES="${{ steps.semantic.outputs.new_release_notes }}"
+        if [ -z "$NOTES" ]; then
+          NOTES="Release ${{ steps.semantic.outputs.new_release_version }}"
+        fi
+        echo "$NOTES" | gh release create v${{ steps.semantic.outputs.new_release_version }} --title "Release ${{ steps.semantic.outputs.new_release_version }}" --notes-file -
