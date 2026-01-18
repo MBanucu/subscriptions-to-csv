@@ -30,6 +30,8 @@
               gawk
               coreutils
               python3Packages.pytest
+              python3Packages.build
+              python3Packages.twine
               self.packages.${system}.subscriptions-to-csv
             ];
 
