@@ -143,6 +143,7 @@ Example:
 ```python
 import sys
 import json
+import csv
 import urllib.request
 ```
 
@@ -189,9 +190,23 @@ except Exception as e:
 
 #### Data Processing
 - Validate input data before processing
+- Store parsed data in Python data structures (lists, dictionaries) before generating output
 - Use list comprehensions for simple transformations
 - Handle edge cases (empty files, malformed lines)
 - Convert strings to appropriate types early
+
+Example:
+```python
+# Parse data into list of dictionaries first
+subscriptions = []
+for item in data:
+    subscriptions.append({
+        'field1': value1,
+        'field2': value2
+    })
+
+# Then generate output using the data structure
+```
 
 #### Performance
 - Minimize API calls (cache rates if possible)
@@ -212,6 +227,22 @@ parser = argparse.ArgumentParser(description='Process subscription data')
 parser.add_argument('--input', '-i', default='subscriptions.txt', help='Input file')
 parser.add_argument('--output', '-o', default='subscriptions.csv', help='Output file')
 args = parser.parse_args()
+```
+
+#### CSV Generation
+- Use the `csv` module from the standard library for proper CSV formatting
+- Prefer `csv.DictWriter` for structured data with headers
+- It handles quoting, escaping, and formatting automatically
+
+Example:
+```python
+import csv
+
+with open(args.output, 'w', newline='') as csvfile:
+    fieldnames = ['Service', 'Price', 'Currency', 'PriceEUR']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(subscriptions)
 ```
 
 ### Bash/Shell Scripting
@@ -286,6 +317,8 @@ When making changes:
 3. Check that exchange rate fetching works
 4. Ensure total calculation is accurate
 5. Update this file if adding new patterns or tools
+
+Recent refactoring example: Separated data parsing from CSV output generation by storing subscription data in Python data structures first, then using `csv.DictWriter` for proper formatting. This improves maintainability and follows the guidelines in this document.
 
 For new features:
 - Consider backward compatibility

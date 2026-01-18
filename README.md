@@ -88,9 +88,9 @@ Example output:
 
 ```
 Service,Price,Currency,PriceEUR
-"Spotify","12.99","€","12.99"
-"Netflix","19.99","€","19.99"
-"GutHub Copilot Pro","10.00","USD","8.62"
+Spotify,12.99,€,12.99
+Netflix,19.99,€,19.99
+GutHub Copilot Pro,10.00,USD,8.62
 Total in EUR: 41.60
 ```
 
