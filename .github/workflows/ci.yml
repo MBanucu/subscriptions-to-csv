@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.13'
-      uses: codecov/codecov-action@v4  # Updated to latest version
+      uses: codecov/codecov-action@v5.5.2  # Latest version as of December 9, 2025
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
