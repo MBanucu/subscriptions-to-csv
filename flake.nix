@@ -35,7 +35,6 @@
             ];
 
             shellHook = ''
-              export PATH="$PATH:${self.packages.${system}.subscriptions-to-csv}/bin"
               echo "You can now run: subscriptions-to-csv"
               echo "Run tests with:  pytest"
             '';
