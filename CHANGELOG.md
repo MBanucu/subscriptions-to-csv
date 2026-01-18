@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.4...v1.1.5) (2026-01-18)
+
+
+### Bug Fixes
+
+* update flake.nix version automatically in releases ([04f6a9a](https://github.com/MBanucu/subscriptions-to-csv/commit/04f6a9a698de9c13b93a5883ad22ac3b964a6df7))
+
 ## [1.1.4](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.3...v1.1.4) (2026-01-18)
 
 
