@@ -89,7 +89,7 @@ jobs:
     - name: Push release branch (if created)
       if: steps.create-branch.outputs.branch_name != ''
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git push --force origin "${{ steps.create-branch.outputs.branch_name }}"
 
@@ -97,7 +97,7 @@ jobs:
       id: check-pr
       if: steps.create-branch.outputs.branch_name != ''
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         BRANCH="${{ steps.create-branch.outputs.branch_name }}"
         EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq 'length')
@@ -110,7 +110,7 @@ jobs:
     - name: Close existing PR (if PR exists)
       if: steps.check-pr.outputs.pr_exists != '0'
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         PR_NUMBER=${{ steps.check-pr.outputs.existing_pr_number }}
         echo "Closing existing PR #$PR_NUMBER to ensure fresh CI triggering..."
@@ -120,7 +120,7 @@ jobs:
       id: create-pr
       if: steps.create-branch.outputs.branch_name != ''
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
          TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
          BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
@@ -131,12 +131,12 @@ jobs:
          ---
          🤖 This PR was automatically created by the release workflow."
 
-          # Create the PR
-          echo "$BODY" | gh pr create \
-            --title "$TITLE" \
-            --body-file - \
-            --base main \
-            --head "${{ steps.create-branch.outputs.branch_name }}"
+           # Create the PR
+           echo "$BODY" | gh pr create \
+             --title "$TITLE" \
+             --body-file - \
+             --base main \
+             --head "${{ steps.create-branch.outputs.branch_name }}"
 
     - name: Auto-merge enabled
       if: steps.create-branch.outputs.branch_name != ''
