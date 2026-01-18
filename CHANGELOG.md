@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.4.0 (2026-01-18)
+
+# [1.4.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.3.0...v1.4.0) (2026-01-18)
+
+
+### Bug Fixes
+
+* remove auto-merge step from release workflow since it's repo-wide ([4c65c97](https://github.com/MBanucu/subscriptions-to-csv/commit/4c65c97006f9e8c04fa60d17bc27d6def8b79137))
+* remove auto-merge step from release workflow since it's repo-wide ([90acbdd](https://github.com/MBanucu/subscriptions-to-csv/commit/90acbdd1bd75d3628e60487cfb602b20ee33e3bb))
+* remove unsupported --json flag from gh pr create in release workflow ([9d83fdf](https://github.com/MBanucu/subscriptions-to-csv/commit/9d83fdf65f2bc2ba96c0026842ed93e2e3566665))
+* remove unsupported --json flag from gh pr create in release workflow ([1342c4b](https://github.com/MBanucu/subscriptions-to-csv/commit/1342c4b7cc86883aec28089ed3f8a8f3f2d352f7))
+* remove unsupported --json flag from gh release create command ([7538bf3](https://github.com/MBanucu/subscriptions-to-csv/commit/7538bf35b059b3a4c7157004efba4d2198ae4844))
+* reorder publish workflow to create GitHub releases before PyPI ([5239b1a](https://github.com/MBanucu/subscriptions-to-csv/commit/5239b1a9b8889fb2f22dda89ad6892aa1bfd695f))
+
+
+### Features
+
+* add test feature to verify release workflow ([7018bda](https://github.com/MBanucu/subscriptions-to-csv/commit/7018bdaf263b20c3524835b6cded23459b7304a4))
+
+
+
+
+
+# Changelog
+
 ## 1.3.1 (2026-01-18)
 
 ## [1.3.1](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.3.0...v1.3.1) (2026-01-18)
