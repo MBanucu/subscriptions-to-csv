@@ -99,6 +99,27 @@ jobs:
         BRANCH="${{ steps.create-branch.outputs.branch_name }}"
         EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq 'length')
         echo "pr_exists=$EXISTING_PR" >> $GITHUB_OUTPUT
+        if [ "$EXISTING_PR" -gt 0 ]; then
+          PR_NUMBER=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+          echo "existing_pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update existing PR (if PR exists)
+      if: steps.check-pr.outputs.pr_exists != '0'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        PR_NUMBER=${{ steps.check-pr.outputs.existing_pr_number }}
+        TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
+        BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
+
+        ## Changes
+        ${{ steps.semantic.outputs.new_release_notes }}
+
+        ---
+        🤖 This PR was automatically updated by the release workflow."
+
+        echo "$BODY" | gh pr edit $PR_NUMBER --title "$TITLE" --body-file -
 
     - name: Create pull request (if release branch created and no PR exists)
       id: create-pr
@@ -125,11 +146,15 @@ jobs:
          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
     - name: Enable auto-merge for PR
-      if: "steps.create-branch.outputs.branch_name != '' && steps.check-pr.outputs.pr_exists == '0'"
+      if: steps.create-branch.outputs.branch_name != ''
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
+        if [ "${{ steps.check-pr.outputs.pr_exists }}" -gt 0 ]; then
+          PR_NUMBER=${{ steps.check-pr.outputs.existing_pr_number }}
+        else
+          PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
+        fi
         echo "Enabling auto-merge for PR #$PR_NUMBER"
-        gh pr merge $PR_NUMBER --auto
+        gh pr merge $PR_NUMBER --auto --rebase
 

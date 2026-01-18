@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ main, 'release/**' ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+  pull_request_target:
+    branches: [ 'release/**' ]
 
 jobs:
   test:
@@ -16,6 +18,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
+      with:
+        ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.ref || github.ref }}
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
