@@ -139,14 +139,12 @@ jobs:
          ---
          🤖 This PR was automatically created by the release workflow."
 
-         PR_NUMBER=$(echo "$BODY" | gh pr create \
-           --title "$TITLE" \
-           --body-file - \
-           --base main \
-           --head "${{ steps.create-branch.outputs.branch_name }}" \
-           --json number --jq '.number')
-
-         echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          # Create the PR
+          echo "$BODY" | gh pr create \
+            --title "$TITLE" \
+            --body-file - \
+            --base main \
+            --head "${{ steps.create-branch.outputs.branch_name }}"
 
     - name: Auto-merge enabled
       if: steps.create-branch.outputs.branch_name != ''
