@@ -532,6 +532,30 @@ gh release create v1.2.3 --generate-notes
 - Uses semantic-release v25.0.2 (latest stable)
 - Follows conventional commits specification v1.0.0
 
+**Monitoring Releases**:
+To watch the automated release process in real-time:
+
+```bash
+# List recent workflow runs
+gh run list --limit 5
+
+# Watch the latest workflow run
+gh run watch $(gh run list --limit 1 --json databaseId -q '.[0].databaseId')
+
+# View detailed logs of a failed run
+gh run view <run-id> --log
+
+# Check release status
+gh release list --limit 3
+```
+
+The release workflow typically completes in 13-16 seconds and includes:
+- Semantic release analysis
+- Version file updates
+- Package building
+- PyPI publishing
+- GitHub release creation
+
 ### Dependencies
 
 - Keep runtime dependencies minimal
