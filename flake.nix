@@ -27,7 +27,6 @@
         {
           default = pkgs.mkShell {
             packages = with pkgs; [
-              gawk
               coreutils
               python3Packages.pytest
               python3Packages.build
