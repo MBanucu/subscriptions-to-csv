@@ -11,6 +11,9 @@ jobs:
   release:
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    outputs:
+      release_branch: ${{ steps.create-branch.outputs.branch_name }}
+      new_release: ${{ steps.semantic.outputs.new_release_published }}
     permissions:
       contents: write
       issues: write
@@ -23,19 +26,25 @@ jobs:
       with:
         fetch-depth: 0  # Important for semantic-release to analyze all commits
 
-    - name: Semantic Release
+    - name: Semantic Release (Dry Run)
       uses: cycjimmy/semantic-release-action@v6
       id: semantic
       with:
         semantic_version: 25.0.2
-        extra_plugins: |
-          @semantic-release/changelog
-          @semantic-release/git
+        dry_run: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Update version files (if release created)
+    - name: Create release branch (if release needed)
+      id: create-branch
       if: steps.semantic.outputs.new_release_published == 'true'
+      run: |
+        BRANCH_NAME="release/v${{ steps.semantic.outputs.new_release_version }}"
+        git checkout -b "$BRANCH_NAME"
+        echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+    - name: Update version files (if release branch created)
+      if: steps.create-branch.outputs.branch_name != ''
       run: |
         # Update version in pyproject.toml
         sed -i "s/version = \".*\"/version = \"${{ steps.semantic.outputs.new_release_version }}\"/" pyproject.toml
@@ -44,14 +53,57 @@ jobs:
         # Update version in flake.nix
         sed -i "s/version = \".*\";/version = \"${{ steps.semantic.outputs.new_release_version }}\";/" flake.nix
 
-    - name: Commit version updates (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
+    - name: Update changelog (if release branch created)
+      if: steps.create-branch.outputs.branch_name != ''
+      run: |
+        # Generate changelog using semantic-release dry run results
+        echo "# Changelog" > temp_changelog.md
+        echo "" >> temp_changelog.md
+        echo "## ${{ steps.semantic.outputs.new_release_version }} ($(date +%Y-%m-%d))" >> temp_changelog.md
+        echo "" >> temp_changelog.md
+        # Add release notes from semantic release
+        if [ -n "${{ steps.semantic.outputs.new_release_notes }}" ]; then
+          echo "${{ steps.semantic.outputs.new_release_notes }}" >> temp_changelog.md
+        fi
+        echo "" >> temp_changelog.md
+
+        # Prepend to existing CHANGELOG.md
+        if [ -f CHANGELOG.md ]; then
+          cat CHANGELOG.md >> temp_changelog.md
+        fi
+        mv temp_changelog.md CHANGELOG.md
+
+    - name: Commit changes (if release branch created)
+      if: steps.create-branch.outputs.branch_name != ''
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add pyproject.toml subscriptions_to_csv/__init__.py flake.nix
-        git commit -m "chore: update version files to ${{ steps.semantic.outputs.new_release_version }} [skip ci]"
-        git push origin main
+        git add pyproject.toml subscriptions_to_csv/__init__.py flake.nix CHANGELOG.md
+        git commit -m "chore(release): ${{ steps.semantic.outputs.new_release_version }}"
+
+    - name: Push release branch (if created)
+      if: steps.create-branch.outputs.branch_name != ''
+      run: |
+        git push origin "${{ steps.create-branch.outputs.branch_name }}"
+
+    - name: Create pull request (if release branch created)
+      if: steps.create-branch.outputs.branch_name != ''
+      run: |
+        TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
+        BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
+
+        ## Changes
+        ${{ steps.semantic.outputs.new_release_notes }}
+
+        ---
+        🤖 This PR was automatically created by the release workflow."
+
+        echo "$BODY" | gh pr create \
+          --title "$TITLE" \
+          --body-file - \
+          --base main \
+          --head "${{ steps.create-branch.outputs.branch_name }}" \
+          --label "automated,release"
 
     - name: Build package (if release created)
       if: steps.semantic.outputs.new_release_published == 'true'
