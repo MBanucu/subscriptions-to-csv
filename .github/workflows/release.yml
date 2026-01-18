@@ -131,23 +131,25 @@ jobs:
          ---
          🤖 This PR was automatically created by the release workflow."
 
-           # Create the PR
-           echo "$BODY" | gh pr create \
+           # Create the PR and capture the URL
+           PR_URL=$(echo "$BODY" | gh pr create \
              --title "$TITLE" \
              --body-file - \
              --base main \
-             --head "${{ steps.create-branch.outputs.branch_name }}"
+             --head "${{ steps.create-branch.outputs.branch_name }}")
+
+           # Extract PR number from URL (format: https://github.com/owner/repo/pull/123)
+           PR_NUMBER=$(echo "$PR_URL" | grep -o '[0-9]\+$')
+
+           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+           echo "✅ Release PR #$PR_NUMBER created: $PR_URL"
 
     - name: Enable auto-merge for release PR
       if: steps.create-branch.outputs.branch_name != ''
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        echo "✅ Release PR created successfully"
-
-        # Get the PR number of the newly created PR
-        BRANCH="${{ steps.create-branch.outputs.branch_name }}"
-        PR_NUMBER=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+        PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
 
         echo "Enabling auto-merge for PR #$PR_NUMBER"
         gh pr merge $PR_NUMBER --auto --rebase
