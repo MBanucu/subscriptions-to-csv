@@ -380,6 +380,47 @@ with open(args.output, 'w', newline='') as csvfile:
 - Test before committing
 - Use meaningful branch names
 
+#### Commit History Cleanup
+
+For complex changes that result in multiple incremental commits (fixes, documentation updates, etc.), consider creating a clean commit history:
+
+1. **Create a clean branch from a stable commit**:
+   ```bash
+   git checkout -b feature-clean <stable-commit-hash>
+   ```
+
+2. **Make all changes at once** on the clean branch:
+   - Implement the complete feature
+   - Add all necessary documentation updates
+   - Fix any issues that arise
+   - Test thoroughly
+
+3. **Create a single comprehensive commit**:
+   ```bash
+   git add <all-changed-files>
+   git commit -m "feat: comprehensive description of all changes
+
+   - Detail all major changes made
+   - List files modified
+   - Explain the complete transformation"
+   ```
+
+4. **Replace the main branch** with the clean history:
+   ```bash
+   git checkout main
+   git reset --hard <clean-branch-commit-hash>
+   git branch -D feature-clean
+   git push  # May need --force if history was rewritten
+   ```
+
+**Benefits**:
+- Cleaner, more understandable git history
+- Easier to review complete changes
+- Better for releases and changelogs
+- Reduces noise from incremental fixes
+
+**When to use**: For complex refactors, major feature additions, or when incremental commits become messy.
+
 ### Dependencies
 
 - Keep runtime dependencies minimal
