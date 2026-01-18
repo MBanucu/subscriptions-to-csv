@@ -22,7 +22,7 @@ You can also use this flake directly from GitHub without cloning:
 # Run with default files
 nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv
 
-# Specify input and output files (recommended)
+# Specify input and output files
 nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv path/to/input.txt path/to/output.csv
 
 # Show help
@@ -31,14 +31,14 @@ nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv -- --help
 
 This approach allows you to use the tool immediately without downloading the source code.
 
-**Note**: When using `nix run` directly from GitHub, use positional arguments for input/output files. Option flags (`--input`, `--output`, `-i`, `-o`) may not work correctly due to nix argument parsing. Options work normally when running locally after cloning.
+**Note**: When using `nix run` directly from GitHub, use positional arguments for input/output files or the `--` separator before option flags. Both approaches work the same way. Options work normally when running locally after cloning.
 
-### Advanced: Using the Wrapper Package
+### Alternative: Using the Wrapper Package
 
-For better argument handling, you can use the wrapper package with long-form options. After the initial cache refresh, both GitHub URL formats work:
+You can also use the wrapper package, which provides identical functionality to the main package:
 
 ```bash
-# Using wrapper with long-form options (after cache refresh)
+# Using wrapper with long-form options
 nix run github:MBanucu/subscriptions-to-csv#wrapper -- --input subscriptions.txt --output output.csv
 
 # Alternative: Always works (bypasses GitHub caching)

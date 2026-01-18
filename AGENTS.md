@@ -38,7 +38,7 @@ The application supports command-line arguments for input and output files, with
 
 - **Default**: `nix run .#subscriptions-to-csv` (uses `subscriptions.txt` and `subscriptions.csv`)
 - **Positional**: `nix run .#subscriptions-to-csv input.txt output.csv`
-- **Wrapper (recommended for GitHub flakes)**: `nix run .#wrapper --input input.txt --output output.csv`
+- **Wrapper**: `nix run .#wrapper --input input.txt --output output.csv`
 - **Help**: `nix run .#subscriptions-to-csv -- --help`
 
 ### Examples
@@ -53,7 +53,7 @@ nix run .#subscriptions-to-csv custom-subscriptions.txt
 # Specify both input and output (positional)
 nix run .#subscriptions-to-csv subscriptions.txt results.csv
 
-# Using wrapper with options (recommended)
+# Using wrapper with options
 nix run .#wrapper --input ~/data/subscriptions.txt --output ~/exports/subs.csv
 
 # Show help
@@ -68,14 +68,14 @@ For running directly from GitHub without cloning:
 # Basic usage (positional args only)
 nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv subscriptions.txt output.csv
 
-# With wrapper for full option support (after cache refresh)
+# Both packages support the same argument patterns
 nix run github:MBanucu/subscriptions-to-csv#wrapper -- --input subscriptions.txt --output output.csv
 
-# Alternative that bypasses GitHub caching
+# Alternative that bypasses GitHub caching (works with both packages)
 nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#wrapper -- --input subscriptions.txt --output output.csv
 ```
 
-**Note**: When using `nix run` with remote flakes, long-form options (`--input`, `--output`) may not work due to nix argument parsing. Use positional arguments or the wrapper package for full option support. If the wrapper isn't found, refresh the cache with: `nix flake metadata --refresh github:MBanucu/subscriptions-to-csv`
+**Note**: When using `nix run` with remote flakes, use the `--` separator before long-form options (`--input`, `--output`) to ensure proper argument parsing. Both `subscriptions-to-csv` and `wrapper` packages support identical argument patterns. If packages aren't found, refresh the cache with: `nix flake metadata --refresh github:MBanucu/subscriptions-to-csv`
 
 ## Build/Lint/Test Commands
 
@@ -417,7 +417,7 @@ When making changes:
 
 Recent refactoring examples:
 - **Multi-architecture support**: Updated flake.nix to support x86_64/aarch64 Linux and macOS using `forAllSystems`
-- **Wrapper package**: Added wrapper package for better GitHub flake argument handling
+- **Wrapper package**: Added wrapper package as an alternative interface with identical functionality
 - **Code organization**: Extracted Python code from inline flake.nix string to separate `main.py` file with proper function structure for better maintainability and testability
 - **Test suite**: Added comprehensive pytest test suite covering all major functionality
 - **Data processing**: Separated data parsing from CSV output generation by storing subscription data in Python data structures first, then using `csv.DictWriter` for proper formatting
