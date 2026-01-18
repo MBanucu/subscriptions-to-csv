@@ -50,7 +50,7 @@
         {
           subscriptions-to-csv = pkgs.python3Packages.buildPythonPackage {
             pname = "subscriptions-to-csv";
-            version = "1.4.0";
+            version = "1.5.0";
             format = "pyproject";
 
             src = ./.;
