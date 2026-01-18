@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.5...v1.2.0) (2026-01-18)
+
+
+### Features
+
+* add CI workflow with pytest ([5783486](https://github.com/MBanucu/subscriptions-to-csv/commit/578348676bb655e6849d037813b2b8b19d0d0124))
+
 ## [1.1.5](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.1.4...v1.1.5) (2026-01-18)
 
 
