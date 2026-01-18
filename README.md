@@ -33,28 +33,6 @@ This approach allows you to use the tool immediately without downloading the sou
 
 **Note**: When using `nix run` directly from GitHub, use positional arguments for input/output files or the `--` separator before option flags. Both approaches work the same way. Options work normally when running locally after cloning.
 
-### Alternative: Using the Wrapper Package
-
-You can also use the wrapper package, which provides identical functionality to the main package:
-
-```bash
-# Using wrapper with long-form options
-nix run github:MBanucu/subscriptions-to-csv#wrapper -- --input subscriptions.txt --output output.csv
-
-# Alternative: Always works (bypasses GitHub caching)
-nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#wrapper -- --input subscriptions.txt --output output.csv
-
-# Clone locally and use options normally
-git clone https://github.com/MBanucu/subscriptions-to-csv
-cd subscriptions-to-csv
-nix run .#wrapper -- --input subscriptions.txt --output output.csv
-```
-
-**Note:** If you get "attribute 'wrapper' not found", refresh the nix cache with:
-```bash
-nix flake metadata --refresh github:MBanucu/subscriptions-to-csv
-```
-
 ## Usage
 
 ### Basic Usage

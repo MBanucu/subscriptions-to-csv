@@ -38,7 +38,7 @@ The application supports command-line arguments for input and output files, with
 
 - **Default**: `nix run .#subscriptions-to-csv` (uses `subscriptions.txt` and `subscriptions.csv`)
 - **Positional**: `nix run .#subscriptions-to-csv input.txt output.csv`
-- **Wrapper**: `nix run .#wrapper --input input.txt --output output.csv`
+- **Named options**: `nix run .#subscriptions-to-csv -- --input input.txt --output output.csv`
 - **Help**: `nix run .#subscriptions-to-csv -- --help`
 
 ### Examples
@@ -53,8 +53,8 @@ nix run .#subscriptions-to-csv custom-subscriptions.txt
 # Specify both input and output (positional)
 nix run .#subscriptions-to-csv subscriptions.txt results.csv
 
-# Using wrapper with options
-nix run .#wrapper --input ~/data/subscriptions.txt --output ~/exports/subs.csv
+# Using named options
+nix run .#subscriptions-to-csv -- --input ~/data/subscriptions.txt --output ~/exports/subs.csv
 
 # Show help
 nix run .#subscriptions-to-csv -- --help
@@ -68,14 +68,14 @@ For running directly from GitHub without cloning:
 # Basic usage (positional args only)
 nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv subscriptions.txt output.csv
 
-# Both packages support the same argument patterns
-nix run github:MBanucu/subscriptions-to-csv#wrapper -- --input subscriptions.txt --output output.csv
+# Using named options (requires -- separator)
+nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv -- --input subscriptions.txt --output output.csv
 
-# Alternative that bypasses GitHub caching (works with both packages)
-nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#wrapper -- --input subscriptions.txt --output output.csv
+# Alternative that bypasses GitHub caching
+nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#subscriptions-to-csv -- --input subscriptions.txt --output output.csv
 ```
 
-**Note**: When using `nix run` with remote flakes, use the `--` separator before long-form options (`--input`, `--output`) to ensure proper argument parsing. Both `subscriptions-to-csv` and `wrapper` packages support identical argument patterns. If packages aren't found, refresh the cache with: `nix flake metadata --refresh github:MBanucu/subscriptions-to-csv`
+**Note**: When using `nix run` with remote flakes, use the `--` separator before long-form options (`--input`, `--output`) to ensure proper argument parsing. If the package isn't found, refresh the cache with: `nix flake metadata --refresh github:MBanucu/subscriptions-to-csv`
 
 ## Build/Lint/Test Commands
 
@@ -83,7 +83,6 @@ nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#wrapper -- --inp
 
 - **Build the flake**: `nix build`
 - **Run the application**: `nix run .#subscriptions-to-csv`
-- **Run wrapper**: `nix run .#wrapper --input file.txt --output out.csv`
 - **Enter development shell**: `nix develop`
 - **Check flake validity**: `nix flake check`
 - **Update flake inputs**: `nix flake update`
@@ -408,7 +407,7 @@ No Copilot rules (.github/copilot-instructions.md) found in this repository.
 When making changes:
 
 1. Always test with `nix run .#subscriptions-to-csv` after modifications, including testing CLI options like `--help`, `--input`, and `--output`
-2. Test the wrapper package: `nix run .#wrapper --input subscriptions.txt --output test.csv`
+2. Test with named options: `nix run .#subscriptions-to-csv -- --input subscriptions.txt --output test.csv`
 3. Run the test suite with `pytest` to ensure no regressions
 4. Verify CSV output format remains consistent
 5. Check that exchange rate fetching works
@@ -417,7 +416,6 @@ When making changes:
 
 Recent refactoring examples:
 - **Multi-architecture support**: Updated flake.nix to support x86_64/aarch64 Linux and macOS using `forAllSystems`
-- **Wrapper package**: Added wrapper package as an alternative interface with identical functionality
 - **Code organization**: Extracted Python code from inline flake.nix string to separate `main.py` file with proper function structure for better maintainability and testability
 - **Test suite**: Added comprehensive pytest test suite covering all major functionality
 - **Data processing**: Separated data parsing from CSV output generation by storing subscription data in Python data structures first, then using `csv.DictWriter` for proper formatting

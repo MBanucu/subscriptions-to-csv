@@ -58,19 +58,6 @@
               python3 main.py "$@"
             '';
           };
-
-          wrapper = pkgs.writeShellApplication {
-            name = "subscriptions-to-csv-wrapper";
-
-            runtimeInputs = with pkgs; [
-              python3
-              coreutils
-            ];
-
-            text = ''
-              python3 main.py "$@"
-            '';
-          };
         }
       );
 
@@ -78,11 +65,6 @@
         default = {
           type = "app";
           program = "${self.packages.${system}.subscriptions-to-csv}/bin/subscriptions-to-csv";
-        };
-
-        wrapper = {
-          type = "app";
-          program = "${self.packages.${system}.wrapper}/bin/subscriptions-to-csv-wrapper";
         };
       });
     };
