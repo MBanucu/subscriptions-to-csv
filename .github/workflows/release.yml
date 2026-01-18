@@ -5,6 +5,8 @@ on:
     workflows: ["CI"]
     types:
       - completed
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -88,6 +90,8 @@ jobs:
 
     - name: Create pull request (if release branch created)
       if: steps.create-branch.outputs.branch_name != ''
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
         BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
