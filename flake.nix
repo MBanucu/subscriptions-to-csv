@@ -8,42 +8,82 @@
   outputs =
     { self, nixpkgs, ... }:
     let
-      # Change this to your system if needed
-      system = "x86_64-linux";
-
-      pkgs = nixpkgs.legacyPackages.${system};
+      # Support multiple systems
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
 
     in
     {
-      devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [
-          gawk
-          coreutils
-          python3Packages.pytest
-        ];
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              gawk
+              coreutils
+              python3Packages.pytest
+            ];
 
-        shellHook = ''
-          echo "You can now run:  subscriptions-to-csv"
-          echo "Run tests with: pytest"
-        '';
-      };
+            shellHook = ''
+              echo "You can now run:  subscriptions-to-csv"
+              echo "Run tests with: pytest"
+            '';
+          };
+        }
+      );
 
-      packages.${system}.subscriptions-to-csv = pkgs.writeShellApplication {
-        name = "subscriptions-to-csv";
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          subscriptions-to-csv = pkgs.writeShellApplication {
+            name = "subscriptions-to-csv";
 
-        runtimeInputs = with pkgs; [
-          python3
-          coreutils
-        ];
+            runtimeInputs = with pkgs; [
+              python3
+              coreutils
+            ];
 
-        text = ''
-          python3 main.py "$@"
-        '';
-      };
+            text = ''
+              python3 main.py "$@"
+            '';
+          };
 
-      apps.${system}.default = {
-        type = "app";
-        program = "${self.packages.${system}.subscriptions-to-csv}/bin/subscriptions-to-csv";
-      };
+          wrapper = pkgs.writeShellApplication {
+            name = "subscriptions-to-csv-wrapper";
+
+            runtimeInputs = with pkgs; [
+              python3
+              coreutils
+            ];
+
+            text = ''
+              python3 main.py "$@"
+            '';
+          };
+        }
+      );
+
+      apps = forAllSystems (system: {
+        default = {
+          type = "app";
+          program = "${self.packages.${system}.subscriptions-to-csv}/bin/subscriptions-to-csv";
+        };
+
+        wrapper = {
+          type = "app";
+          program = "${self.packages.${system}.wrapper}/bin/subscriptions-to-csv-wrapper";
+        };
+      });
     };
 }
