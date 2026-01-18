@@ -161,6 +161,28 @@ This creates a proper Python package using `buildPythonPackage` that can be inst
 
 ### Testing
 
+Run the comprehensive test suite including CLI integration tests:
+
+```bash
+# Run unit tests
+nix develop --command pytest
+
+# Run flake checks (includes CLI functionality tests)
+nix flake check
+
+# Run specific flake checks
+nix build .#checks.x86_64-linux.help-test
+nix build .#checks.x86_64-linux.basic-test
+nix build .#checks.x86_64-linux.named-args-test
+```
+
+The flake checks verify that:
+- The `--help` command works correctly
+- Basic functionality with sample data works
+- Positional and named arguments function properly
+
+### Testing
+
 ```bash
 # Run the test suite
 nix develop
