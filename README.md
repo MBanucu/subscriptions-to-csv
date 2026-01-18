@@ -10,7 +10,50 @@ This tool processes a text file containing subscription services and their price
 
 Ensure you have Nix installed with flakes enabled.
 
-Clone or download this repository.
+### Option 1: Clone the Repository
+
+Clone or download this repository to use locally.
+
+### Option 2: Direct from GitHub
+
+You can also use this flake directly from GitHub without cloning:
+
+```bash
+# Run with default files
+nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv
+
+# Specify input and output files (recommended)
+nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv path/to/input.txt path/to/output.csv
+
+# Show help
+nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv -- --help
+```
+
+This approach allows you to use the tool immediately without downloading the source code.
+
+**Note**: When using `nix run` directly from GitHub, use positional arguments for input/output files. Option flags (`--input`, `--output`, `-i`, `-o`) may not work correctly due to nix argument parsing. Options work normally when running locally after cloning.
+
+### Advanced: Using the Wrapper Package
+
+For better argument handling, you can use the wrapper package with long-form options. After the initial cache refresh, both GitHub URL formats work:
+
+```bash
+# Using wrapper with long-form options (after cache refresh)
+nix run github:MBanucu/subscriptions-to-csv#wrapper -- --input subscriptions.txt --output output.csv
+
+# Alternative: Always works (bypasses GitHub caching)
+nix run git+https://github.com/MBanucu/subscriptions-to-csv.git#wrapper -- --input subscriptions.txt --output output.csv
+
+# Clone locally and use options normally
+git clone https://github.com/MBanucu/subscriptions-to-csv
+cd subscriptions-to-csv
+nix run .#wrapper -- --input subscriptions.txt --output output.csv
+```
+
+**Note:** If you get "attribute 'wrapper' not found", refresh the nix cache with:
+```bash
+nix flake metadata --refresh github:MBanucu/subscriptions-to-csv
+```
 
 ## Usage
 
