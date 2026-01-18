@@ -29,16 +29,9 @@ jobs:
         extra_plugins: |
           @semantic-release/changelog
           @semantic-release/git
+          @semantic-release/exec
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Update version files (if release created)
-      if: steps.semantic.outputs.new_release_published == 'true'
-      run: |
-        # Update version in pyproject.toml
-        sed -i "s/version = \".*\"/version = \"${{ steps.semantic.outputs.new_release_version }}\"/" pyproject.toml
-        # Update version in __init__.py
-        sed -i "s/__version__ = \".*\"/__version__ = \"${{ steps.semantic.outputs.new_release_version }}\"/" subscriptions_to_csv/__init__.py
 
     - name: Build package (if release created)
       if: steps.semantic.outputs.new_release_published == 'true'
