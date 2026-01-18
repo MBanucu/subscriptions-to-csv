@@ -5,10 +5,28 @@ This file provides guidelines and commands for agentic coding agents working on 
 ## Overview
 
 This project is a Nix flake containing:
-- A Python script for processing subscription data with command-line argument parsing
+- A Python script (`main.py`) for processing subscription data with command-line argument parsing
 - Exchange rate fetching from API
 - CSV generation with EUR conversions
 - Total sum calculation
+- Comprehensive unit test suite (`tests/test_main.py`)
+
+## Project Structure
+
+```
+.
+├── flake.nix          # Nix flake configuration
+├── flake.lock         # Nix flake lock file
+├── main.py            # Main Python application
+├── tests/             # Test directory
+│   ├── test_main.py   # Unit tests
+│   └── README.md      # Test documentation
+├── subscriptions.txt  # Default input file (example)
+├── subscriptions.csv  # Default output file (generated)
+├── README.md          # Project README
+├── AGENTS.md          # This file - agent guidelines
+└── .gitignore         # Git ignore patterns
+```
 
 ## CLI Usage
 
@@ -54,7 +72,28 @@ Note: When running from GitHub (e.g., `nix run github:MBanucu/subscriptions-to-c
 
 ### Testing
 
-There are currently no automated tests in this project. To manually test:
+The project includes a comprehensive unit test suite using pytest. Tests cover argument parsing, exchange rate fetching, data processing, and CSV generation.
+
+#### Running Tests
+
+- **Run all tests**: `nix develop` then `pytest`
+- **Run specific test file**: `pytest tests/test_main.py`
+- **Run specific test**: `pytest tests/test_main.py::TestParseArguments::test_default_arguments`
+- **Run with verbose output**: `pytest -v`
+- **Run tests matching pattern**: `pytest -k "parse"`
+
+#### Test Coverage
+
+The test suite includes:
+- **Argument parsing**: Default, positional, and optional arguments
+- **Exchange rate API**: Successful fetching and fallback behavior
+- **Data parsing**: EUR/USD currency conversion, multiple subscriptions, error handling
+- **CSV generation**: File output, headers, and total calculations
+- **Integration tests**: Full workflow from input to output
+
+#### Manual Testing
+
+For additional manual verification:
 
 - Run the command: `nix run .#subscriptions-to-csv`
 - Verify output CSV is created correctly
@@ -74,6 +113,7 @@ No formal linting is configured. For Python code within the flake:
 
 - Use `python3 -m py_compile` to check syntax
 - Manually review for PEP 8 compliance
+- Run tests with `pytest` to ensure functionality
 
 For Nix code:
 - `nix flake check` will catch basic errors
@@ -131,7 +171,7 @@ Example:
 - Use `with pkgs;` sparingly, prefer explicit imports
 - Pin versions through flake inputs
 
-### Python (Embedded Script)
+### Python (main.py)
 
 #### Imports
 - Import standard library modules first
@@ -215,18 +255,27 @@ for item in data:
 
 #### CLI Argument Parsing
 - Use `argparse` from the standard library for command-line interfaces
-- Define positional and optional arguments with clear descriptions
-- Provide sensible defaults for input/output files
+- Define both positional and optional arguments with clear descriptions
+- Handle argument precedence (optional overrides positional, defaults as fallback)
 - Support `--help` for usage information
 
 Example:
 ```python
 import argparse
 
-parser = argparse.ArgumentParser(description='Process subscription data')
-parser.add_argument('--input', '-i', default='subscriptions.txt', help='Input file')
-parser.add_argument('--output', '-o', default='subscriptions.csv', help='Output file')
-args = parser.parse_args()
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Convert subscription list to CSV with EUR conversion')
+    parser.add_argument('input_pos', nargs='?', help='Input file containing subscriptions')
+    parser.add_argument('output_pos', nargs='?', help='Output CSV file')
+    parser.add_argument('--input', '-i', help='Input file containing subscriptions')
+    parser.add_argument('--output', '-o', help='Output CSV file')
+    args = parser.parse_args()
+
+    # Use optional args if provided, otherwise positional, otherwise defaults
+    args.input = args.input or args.input_pos or 'subscriptions.txt'
+    args.output = args.output or args.output_pos or 'subscriptions.csv'
+
+    return args
 ```
 
 #### CSV Generation
@@ -293,7 +342,6 @@ with open(args.output, 'w', newline='') as csvfile:
 
 ### Future Improvements
 
-- Add proper test suite with pytest
 - Implement caching for exchange rates
 - Add configuration file support
 - Improve error messages and user feedback
@@ -313,12 +361,16 @@ No Copilot rules (.github/copilot-instructions.md) found in this repository.
 When making changes:
 
 1. Always test with `nix run .#subscriptions-to-csv` after modifications, including testing CLI options like `--help`, `--input`, and `--output`
-2. Verify CSV output format remains consistent
-3. Check that exchange rate fetching works
-4. Ensure total calculation is accurate
-5. Update this file if adding new patterns or tools
+2. Run the test suite with `pytest` to ensure no regressions
+3. Verify CSV output format remains consistent
+4. Check that exchange rate fetching works
+5. Ensure total calculation is accurate
+6. Update this file if adding new patterns or tools
 
-Recent refactoring example: Separated data parsing from CSV output generation by storing subscription data in Python data structures first, then using `csv.DictWriter` for proper formatting. This improves maintainability and follows the guidelines in this document.
+Recent refactoring examples:
+- **Code organization**: Extracted Python code from inline flake.nix string to separate `main.py` file with proper function structure for better maintainability and testability
+- **Test suite**: Added comprehensive pytest test suite covering all major functionality
+- **Data processing**: Separated data parsing from CSV output generation by storing subscription data in Python data structures first, then using `csv.DictWriter` for proper formatting
 
 For new features:
 - Consider backward compatibility

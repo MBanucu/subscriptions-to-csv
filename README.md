@@ -1,10 +1,10 @@
 # Subscriptions to CSV
 
-A simple Nix flake utility to convert a subscription list into a CSV file with EUR conversions and totals.
+A simple Nix flake utility to convert a subscription list into a CSV file with EUR conversions and totals. Includes a comprehensive test suite for reliable development.
 
 ## Description
 
-This tool processes a text file containing subscription services and their prices, generates a CSV with columns for Service, Price, Currency, and Price in EUR (with automatic USD to EUR conversion), and calculates the total sum in EUR.
+This tool processes a text file containing subscription services and their prices, generates a CSV with columns for Service, Price, Currency, and Price in EUR (with automatic USD to EUR conversion), and calculates the total sum in EUR. The project includes comprehensive unit tests covering all major functionality.
 
 ## Installation
 
@@ -46,8 +46,10 @@ nix run .#subscriptions-to-csv
 
 ```bash
 # Show usage information
-nix run .#subscriptions-to-csv --help
+nix run .#subscriptions-to-csv -- --help
 ```
+
+Note: The `--` separates nix arguments from application arguments.
 
 ## Input Format
 
@@ -101,6 +103,15 @@ Total in EUR: 41.60
 - **Exchange rate**: Automatically fetched from exchangerate-api.com
 - **Fallback**: If API fails, uses rate 1.0
 
+## Test Coverage
+
+The project includes comprehensive unit tests covering:
+- Command-line argument parsing (default, positional, optional)
+- Exchange rate API fetching with fallback behavior
+- Subscription data parsing and currency conversion
+- CSV file generation and total calculations
+- Integration testing of the full workflow
+
 ## Requirements
 
 - Nix with flakes support
@@ -117,11 +128,19 @@ nix build
 ### Testing
 
 ```bash
-# Run with defaults
+# Run the test suite
+nix develop
+pytest
+
+# Run specific tests
+pytest tests/test_main.py
+pytest -k "parse"  # Run tests matching pattern
+
+# Manual testing - Run with defaults
 nix run .#subscriptions-to-csv
 
 # Test CLI options
-nix run .#subscriptions-to-csv --help
+nix run .#subscriptions-to-csv -- --help
 
 # Check the output CSV and total
 ```
@@ -135,8 +154,9 @@ See AGENTS.md for detailed coding guidelines.
 1. Fork the repository
 2. Create a feature branch
 3. Make changes
-4. Test with `nix run .#subscriptions-to-csv`
-5. Submit a pull request
+4. Run tests: `nix develop && pytest`
+5. Test manually: `nix run .#subscriptions-to-csv`
+6. Submit a pull request
 
 ## License
 
