@@ -35,11 +35,16 @@
         ];
 
         text = ''
-          input_file="''${1:-subscriptions.txt}"
-          output_file="''${2:-subscriptions.csv}"
-
           python3 -c "
-          import sys, json, urllib.request
+          import sys, json, urllib.request, argparse
+
+          # Parse arguments
+          parser = argparse.ArgumentParser(description='Convert subscription list to CSV with EUR conversion')
+          parser.add_argument('input', nargs='?', default='subscriptions.txt', help='Input file containing subscriptions')
+          parser.add_argument('output', nargs='?', default='subscriptions.csv', help='Output CSV file')
+          parser.add_argument('--input', '-i', dest='input', help='Input file containing subscriptions')
+          parser.add_argument('--output', '-o', dest='output', help='Output CSV file')
+          args = parser.parse_args()
 
           # Fetch USD to EUR exchange rate
           try:
@@ -51,14 +56,12 @@
               rate = 1.0  # fallback
 
           # Read input file
-          input_file = sys.argv[1] if len(sys.argv) > 1 else '$input_file'
-          with open(input_file, 'r') as f:
+          with open(args.input, 'r') as f:
               lines = f.readlines()
 
           # Output CSV
-          output_file = sys.argv[2] if len(sys.argv) > 2 else '$output_file'
           total_eur = 0.0
-          with open(output_file, 'w') as out:
+          with open(args.output, 'w') as out:
               print('Service,Price,Currency,PriceEUR', file=out)
               for i in range(0, len(lines), 2):
                   if i + 1 >= len(lines):
@@ -81,15 +84,15 @@
                   total_eur += eur_price
                   print(f'\"{service}\",\"{price:.2f}\",\"{currency}\",\"{eur_price:.2f}\"', file=out)
 
-          print(f'Created {output_file}')
+          print(f'Created {args.output}')
           print('First few lines:')
-          with open(output_file, 'r') as f:
+          with open(args.output, 'r') as f:
               for i, line in enumerate(f):
                   if i >= 5:
                       break
                   print(line.rstrip())
           print(f'Total in EUR: {total_eur:.2f}')
-          " "$input_file" "$output_file"
+          " "$@"
         '';
       };
 
