@@ -108,8 +108,7 @@ jobs:
           --title "$TITLE" \
           --body-file - \
           --base main \
-          --head "${{ steps.create-branch.outputs.branch_name }}" \
-          --label "automated,release"
+          --head "${{ steps.create-branch.outputs.branch_name }}"
 
     - name: Build package (if release created)
       if: steps.semantic.outputs.new_release_published == 'true'
