@@ -28,7 +28,7 @@ def fetch_exchange_rate() -> float:
     try:
         with urllib.request.urlopen('https://api.exchangerate-api.com/v4/latest/USD') as f:
             data = json.load(f)
-        return data['rates']['EUR']
+        return float(data['rates']['EUR'])
     except Exception:
         return 1.0  # fallback
 
@@ -160,7 +160,7 @@ class SubscriptionConverter:
         """
         self.exchange_rate = exchange_rate
 
-    def set_exchange_rate(self, rate: float):
+    def set_exchange_rate(self, rate: float) -> None:
         """Set a custom exchange rate."""
         self.exchange_rate = rate
 
