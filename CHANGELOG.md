@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.6.0 (2026-01-19)
+
+# [1.6.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.5.2...v1.6.0) (2026-01-19)
+
+
+### Features
+
+* improve release workflow with PR checks watch ([fd4854a](https://github.com/MBanucu/subscriptions-to-csv/commit/fd4854a5a3a57ffc54205e8004120bc3a8adf15f))
+
+
+
+
+
+# Changelog
+
 ## 1.5.2 (2026-01-19)
 
 ## [1.5.2](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.5.1...v1.5.2) (2026-01-19)
