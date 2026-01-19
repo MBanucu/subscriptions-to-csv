@@ -148,7 +148,7 @@ jobs:
 
   publish:
     needs: release
-    if: needs.release.outputs.released == 'true' && needs.release.outputs.has_release_commits == 'true'
+    if: needs.release.outputs.released == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write  # For creating GitHub releases
