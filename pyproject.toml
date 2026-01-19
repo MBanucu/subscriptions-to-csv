@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "subscriptions-to-csv"
-version = "1.8.1"
+version = "1.8.2"
 description = "Convert subscription lists to CSV with EUR conversion"
 readme = "README.md"
 license = {text = "MIT"}
@@ -50,7 +50,7 @@ include = ["subscriptions_to_csv*"]
 version_toml = ["pyproject.toml:project.version"]
 version_variables = [
     "subscriptions_to_csv/__init__.py:__version__",
-    "flake.nix:            version = \"{{version}}\";"
+    "flake.nix:version = \"{{version}}\""
 ]
 
 [tool.semantic_release.branches.main]
