@@ -18,12 +18,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6.0.2  # Latest version as of January 9, 2026
+      uses: actions/checkout@v6
       with:
         ref: ${{ github.event.pull_request.head.sha || github.ref }}  # Use head SHA for pull_request_target to checkout PR code safely
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6.1.0  # Latest version as of November 24, 2025
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -39,7 +39,7 @@ jobs:
 
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.13'
-      uses: codecov/codecov-action@v5.5.2  # Latest version as of December 9, 2025
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
