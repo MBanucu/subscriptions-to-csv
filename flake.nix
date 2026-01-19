@@ -55,8 +55,8 @@
                 python -m venv .venv
                 echo "Activating virtual environment and installing development tools..."
                 source .venv/bin/activate
-                pip install python-semantic-release mypy
-                echo "Virtual environment ready with python-semantic-release and mypy installed."
+                pip install python-semantic-release
+                echo "Virtual environment ready with python-semantic-release installed."
               else
                 echo "Activating existing virtual environment..."
                 source .venv/bin/activate
