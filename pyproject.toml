@@ -53,3 +53,11 @@ version_variables = [
     "flake.nix:version = \"{{version}}\";"
 ]
 build_command = "python -m build --sdist --wheel ."
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false
+
+[tool.semantic_release.branches.release]
+match = "release/.*"
+prerelease = false
