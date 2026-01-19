@@ -48,6 +48,48 @@ jobs:
         print(f'Generated requirements-dev.txt with {len(deps)} dependencies')
         "
 
+    - name: Validate requirements-dev.txt sync
+      run: |
+        # Generate fresh copy for comparison
+        python3 -c "
+        import sys
+        try:
+            import tomllib
+        except ImportError:
+            import subprocess
+            subprocess.run([sys.executable, '-m', 'pip', 'install', 'tomli'], check=True)
+            import tomli as tomllib
+
+        with open('pyproject.toml', 'rb') as f:
+            data = tomllib.load(f)
+        deps = data.get('project', {}).get('optional-dependencies', {}).get('dev', [])
+
+        with open('requirements-dev-generated.txt', 'w') as f:
+            f.write('# Auto-generated from pyproject.toml optional-dependencies.dev\n')
+            f.write('# Do not edit manually\n\n')
+            for dep in sorted(deps):
+                f.write(f'{dep}\n')
+        "
+
+        # Compare with committed version
+        if ! diff -q requirements-dev.txt requirements-dev-generated.txt > /dev/null 2>&1; then
+          echo "❌ requirements-dev.txt is out of sync with pyproject.toml"
+          echo ""
+          echo "Expected content (auto-generated):"
+          cat requirements-dev-generated.txt
+          echo ""
+          echo "Actual content (committed):"
+          cat requirements-dev.txt
+          echo ""
+          echo "💡 To fix: The requirements-dev.txt should be auto-generated from pyproject.toml"
+          echo "   Do not edit it manually. Update pyproject.toml optional-dependencies.dev instead."
+          rm requirements-dev-generated.txt
+          exit 1
+        fi
+
+        echo "✅ requirements-dev.txt is in sync with pyproject.toml"
+        rm requirements-dev-generated.txt
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
@@ -130,6 +172,48 @@ jobs:
                   f.write(f'{dep}\n')
           print(f'Generated requirements-dev.txt with {len(deps)} dependencies')
           "
+
+      - name: Validate requirements-dev.txt sync
+        run: |
+          # Generate fresh copy for comparison
+          python3 -c "
+          import sys
+          try:
+              import tomllib
+          except ImportError:
+              import subprocess
+              subprocess.run([sys.executable, '-m', 'pip', 'install', 'tomli'], check=True)
+              import tomli as tomllib
+
+          with open('pyproject.toml', 'rb') as f:
+              data = tomllib.load(f)
+          deps = data.get('project', {}).get('optional-dependencies', {}).get('dev', [])
+
+          with open('requirements-dev-generated.txt', 'w') as f:
+              f.write('# Auto-generated from pyproject.toml optional-dependencies.dev\n')
+              f.write('# Do not edit manually\n\n')
+              for dep in sorted(deps):
+                  f.write(f'{dep}\n')
+          "
+
+          # Compare with committed version
+          if ! diff -q requirements-dev.txt requirements-dev-generated.txt > /dev/null 2>&1; then
+            echo "❌ requirements-dev.txt is out of sync with pyproject.toml"
+            echo ""
+            echo "Expected content (auto-generated):"
+            cat requirements-dev-generated.txt
+            echo ""
+            echo "Actual content (committed):"
+            cat requirements-dev.txt
+            echo ""
+            echo "💡 To fix: The requirements-dev.txt should be auto-generated from pyproject.toml"
+            echo "   Do not edit it manually. Update pyproject.toml optional-dependencies.dev instead."
+            rm requirements-dev-generated.txt
+            exit 1
+          fi
+
+          echo "✅ requirements-dev.txt is in sync with pyproject.toml"
+          rm requirements-dev-generated.txt
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v6
