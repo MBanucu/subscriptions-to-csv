@@ -178,8 +178,22 @@ jobs:
           counter=$((counter + 1))
         done
 
+        if [ $counter -eq 10 ]; then
+          echo "Error: Checks did not start within 10 seconds for PR #$PR_NUMBER"
+          exit 1
+        fi
+
         gh pr checks $PR_NUMBER --watch
-        while true; do
+
+        # Check for failing checks
+        if gh pr checks $PR_NUMBER | grep -q "fail"; then
+          echo "Error: Some checks failed for PR #$PR_NUMBER"
+          exit 1
+        fi
+
+        # Wait for merge (timeout 10 minutes)
+        merge_counter=0
+        while [ $merge_counter -lt 600 ]; do
           MERGED_AT=$(gh pr view $PR_NUMBER --json mergedAt --jq .mergedAt)
           if [ "$MERGED_AT" != "" ]; then
             echo "PR #$PR_NUMBER has been merged!"
@@ -187,7 +201,13 @@ jobs:
           fi
           echo "PR #$PR_NUMBER not yet merged, waiting..."
           sleep 1
+          merge_counter=$((merge_counter + 1))
         done
+
+        if [ $merge_counter -eq 600 ]; then
+          echo "Error: PR #$PR_NUMBER was not merged within 10 minutes"
+          exit 1
+        fi
 
   publish:
     needs: release
