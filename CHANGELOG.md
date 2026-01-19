@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.7.0 (2026-01-19)
+
+# [1.7.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.6.0...v1.7.0) (2026-01-19)
+
+
+### Features
+
+* add failure conditions to PR merge wait step ([385989e](https://github.com/MBanucu/subscriptions-to-csv/commit/385989e6375085b248629636ec734a54fb45ade8))
+
+
+
+
+
+# Changelog
+
 ## 1.6.0 (2026-01-19)
 
 # [1.6.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.5.2...v1.6.0) (2026-01-19)
