@@ -50,6 +50,7 @@ jobs:
       with:
         push: false
         vcs_release: false
+        commit: true
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push release branch (if created)
