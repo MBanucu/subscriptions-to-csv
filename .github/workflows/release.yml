@@ -18,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_branch: ${{ steps.create-branch.outputs.branch_name }}
-      new_release: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+      new_release_notes: ${{ steps.semantic.outputs.new_release_notes }}
     permissions:
       contents: write
       issues: write
@@ -155,4 +157,67 @@ jobs:
         gh pr merge $PR_NUMBER --auto --rebase
 
         echo "🤖 Auto-merge enabled for release PR #$PR_NUMBER"
+
+    - name: Wait for PR to merge
+      if: steps.create-branch.outputs.branch_name != ''
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
+        echo "Waiting for PR #$PR_NUMBER to be merged..."
+        while true; do
+          MERGED=$(gh pr view $PR_NUMBER --json merged --jq .merged)
+          if [ "$MERGED" = "true" ]; then
+            echo "PR #$PR_NUMBER has been merged!"
+            break
+          fi
+          echo "PR #$PR_NUMBER not yet merged, waiting..."
+          sleep 30
+        done
+
+  publish:
+    needs: release
+    if: needs.release.outputs.new_release_published == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # For creating GitHub releases
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+
+    steps:
+    - name: Checkout main branch
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+
+    - name: Build package
+      run: python -m build
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        print-hash: true
+
+    - name: Create GitHub release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        echo "Creating GitHub release v${{ needs.release.outputs.new_release_version }}..."
+
+        # Create the release with generated notes
+        gh release create v${{ needs.release.outputs.new_release_version }} \
+          --title "Release v${{ needs.release.outputs.new_release_version }}" \
+          --notes "${{ needs.release.outputs.new_release_notes }}"
+
+        echo "✅ GitHub release created successfully"
+
 
