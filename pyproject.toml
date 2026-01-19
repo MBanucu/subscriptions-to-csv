@@ -52,7 +52,6 @@ version_toml = ["pyproject.toml:project.version"]
 version_variables = [
     "subscriptions_to_csv/__init__.py:__version__"
 ]
-build_command = "python -m build"
 
 [tool.semantic_release.changelog]
 default_templates.changelog_file = "CHANGELOG.md"
