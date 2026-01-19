@@ -33,7 +33,11 @@
               python3Packages.twine
               self.packages.${system}.subscriptions-to-csv
             ];
-
+            nativeBuildInputs = with pkgs; [
+              # Add this for interactive Bash
+              bashInteractive
+            ];
+            
             shellHook = ''
               echo "You can now run: subscriptions-to-csv"
               echo "Run tests with:  pytest"
