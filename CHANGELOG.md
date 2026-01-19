@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.7.1 (2026-01-19)
+
+## [1.7.1](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.7.0...v1.7.1) (2026-01-19)
+
+
+### Bug Fixes
+
+* remove unused push trigger from release workflow ([05406dc](https://github.com/MBanucu/subscriptions-to-csv/commit/05406dcbb403805f17d99ab984c787bd70972afa))
+
+
+
+
+
+# Changelog
+
 ## 1.7.0 (2026-01-19)
 
 # [1.7.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.6.0...v1.7.0) (2026-01-19)
