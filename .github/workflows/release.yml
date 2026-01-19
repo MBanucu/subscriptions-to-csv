@@ -54,6 +54,7 @@ jobs:
         commit: true
         changelog: true
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        remote: origin
 
     - name: Create pull request (always create fresh PR)
       id: create-pr
