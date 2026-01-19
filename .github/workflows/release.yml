@@ -30,7 +30,7 @@ jobs:
         fetch-depth: 0  # Important for semantic-release to analyze all commits
 
     - name: Determine next version (Dry Run)
-      uses: python-semantic-release/python-semantic-release@v9
+      uses: python-semantic-release/python-semantic-release@v10
       id: release
       with:
         root_options: --noop
@@ -46,7 +46,7 @@ jobs:
 
     - name: Update version and create release (if release branch created)
       if: steps.create-branch.outputs.branch_name != ''
-      uses: python-semantic-release/python-semantic-release@v9
+      uses: python-semantic-release/python-semantic-release@v10
       with:
         root_options: --no-push --no-vcs-release --no-pypi-publish
         github_token: ${{ secrets.GITHUB_TOKEN }}
