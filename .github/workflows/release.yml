@@ -1,198 +1,54 @@
 name: Release
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
-    branches:
-      - main
-  workflow_dispatch:
+  push:
+    branches: ["main"]
+  workflow_dispatch:   # ← nice to have for manual testing
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write      # Keep if you use trusted publishing to PyPI
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    outputs:
-      release_branch: ${{ steps.create-branch.outputs.branch_name }}
-      released: ${{ steps.release.outputs.released }}
-      version: ${{ steps.release.outputs.version }}
-      changelog: ${{ steps.release.outputs.changelog }}
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0  # Important for semantic-release to analyze all commits
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0     # Required for full history analysis
 
-    - name: Determine next version (Dry Run)
-      uses: python-semantic-release/python-semantic-release@v10
-      id: release
-      with:
-        no_operation_mode: true
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-    - name: Create release branch (if release needed)
-      id: create-branch
-      if: steps.release.outputs.released == 'true'
-      run: |
-        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        BRANCH_NAME="release/${{ steps.release.outputs.tag }}-$TIMESTAMP"
-        git checkout -b "$BRANCH_NAME"
-        git push -u origin "$BRANCH_NAME"
-        echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+      - name: Python Semantic Release
+        id: semantic-release
+        uses: python-semantic-release/python-semantic-release@v10
+        with:
+          github_token: ${{ steps.app-token.outputs.token }}
+          push: true
+          commit: true
+          changelog: true
+          vcs_release: true              # Creates GitHub Release automatically
 
-    - name: Update version, create release, and push (if release branch created)
-      if: steps.create-branch.outputs.branch_name != ''
-      uses: python-semantic-release/python-semantic-release@v10
-      with:
-        push: true
-        vcs_release: false
-        commit: true
-        changelog: true
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      # ───────────────────────────────────────────────────────────────
+      # PyPI publishing (only runs if a release actually happened)
+      # ───────────────────────────────────────────────────────────────
+      - name: Build package
+        if: success() && steps.semantic-release.outputs.released == 'true'
+        run: python -m build
 
-    - name: Create pull request (always create fresh PR)
-      id: create-pr
-      if: steps.create-branch.outputs.branch_name != ''
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        TITLE="chore(release): ${{ steps.release.outputs.version }}"
-        BODY="Automated release ${{ steps.release.outputs.version }}
-
-        ## Changes
-        ${{ steps.release.outputs.changelog }}
-
-        ---
-        🤖 This PR was automatically created by the release workflow."
-
-        # Create the PR and capture the URL
-        PR_URL=$(echo "$BODY" | gh pr create \
-          --title "$TITLE" \
-          --body-file - \
-          --base main \
-          --head "${{ steps.create-branch.outputs.branch_name }}")
-
-        # Extract PR number from URL (format: https://github.com/owner/repo/pull/123)
-        PR_NUMBER=$(echo "$PR_URL" | grep -o '[0-9]\+$')
-
-        echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-        echo "✅ Release PR #$PR_NUMBER created: $PR_URL"
-
-    - name: Enable auto-merge for release PR
-      if: steps.create-branch.outputs.branch_name != ''
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
-
-        echo "Enabling auto-merge for PR #$PR_NUMBER"
-        gh pr merge $PR_NUMBER --auto --rebase
-
-        echo "🤖 Auto-merge enabled for release PR #$PR_NUMBER"
-
-    - name: Wait for PR to merge
-      if: steps.create-branch.outputs.branch_name != ''
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
-        echo "Waiting for PR #$PR_NUMBER to be merged..."
-
-        # Wait for checks to be reported (timeout 10s)
-        counter=0
-        while [ $counter -lt 10 ]; do
-          if gh pr checks $PR_NUMBER | grep -q "pass\|fail\|pending"; then
-            echo "Checks reported for PR #$PR_NUMBER"
-            break
-          fi
-          echo "Waiting for checks to be reported..."
-          sleep 1
-          counter=$((counter + 1))
-        done
-
-        if [ $counter -eq 10 ]; then
-          echo "Error: Checks did not start within 10 seconds for PR #$PR_NUMBER"
-          exit 1
-        fi
-
-        gh pr checks $PR_NUMBER --watch
-
-        # Check for failing checks
-        if gh pr checks $PR_NUMBER | grep -q "fail"; then
-          echo "Error: Some checks failed for PR #$PR_NUMBER"
-          exit 1
-        fi
-
-        # Wait for merge (timeout 10 minutes)
-        merge_counter=0
-        while [ $merge_counter -lt 600 ]; do
-          MERGED_AT=$(gh pr view $PR_NUMBER --json mergedAt --jq .mergedAt)
-          if [ "$MERGED_AT" != "" ]; then
-            echo "PR #$PR_NUMBER has been merged!"
-            break
-          fi
-          echo "PR #$PR_NUMBER not yet merged, waiting..."
-          sleep 1
-          merge_counter=$((merge_counter + 1))
-        done
-
-        if [ $merge_counter -eq 600 ]; then
-          echo "Error: PR #$PR_NUMBER was not merged within 10 minutes"
-          exit 1
-        fi
-
-  publish:
-    needs: release
-    if: needs.release.outputs.released == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write  # For creating GitHub releases
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
-
-    steps:
-    - name: Checkout main branch
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-
-    - name: Pull latest changes
-      run: git pull origin main
-
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.x'
-
-    - name: Install build dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install build
-
-    - name: Build package
-      run: python -m build
-
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        print-hash: true
-
-    - name: Create GitHub release
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        echo "Creating GitHub release v${{ needs.release.outputs.version }}..."
-
-        # Create the release with generated notes
-        gh release create v${{ needs.release.outputs.version }} \
-          --title "Release v${{ needs.release.outputs.version }}" \
-          --notes "${{ needs.release.outputs.changelog }}"
-
-        echo "✅ GitHub release created successfully"
+      - name: Publish distribution to PyPI
+        if: success() && steps.semantic-release.outputs.released == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
 
 
