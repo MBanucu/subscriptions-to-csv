@@ -47,6 +47,7 @@ subscriptions-to-csv = "subscriptions_to_csv.cli:main"
 include = ["subscriptions_to_csv*"]
 
 [tool.semantic_release]
+tag_format = "v{version}"
 version_toml = ["pyproject.toml:project.version"]
 version_variables = [
     "subscriptions_to_csv/__init__.py:__version__"

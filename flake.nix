@@ -17,6 +17,10 @@
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
 
+      # Read version directly from pyproject.toml
+      pyproject = builtins.fromTOML (builtins.readFile ./pyproject.toml);
+      version = pyproject.project.version;
+
     in
     {
       devShells = forAllSystems (
@@ -37,7 +41,7 @@
               # Add this for interactive Bash
               bashInteractive
             ];
-            
+
             shellHook = ''
               echo "You can now run: subscriptions-to-csv"
               echo "Run tests with:  pytest"
@@ -54,7 +58,7 @@
         {
           subscriptions-to-csv = pkgs.python3Packages.buildPythonPackage {
             pname = "subscriptions-to-csv";
-            version = "1.8.2";
+            version = version;
             format = "pyproject";
 
             src = ./.;
