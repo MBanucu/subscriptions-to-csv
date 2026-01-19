@@ -33,6 +33,7 @@
             packages = with pkgs; [
               coreutils
               python3Packages.pytest
+              python3Packages.mypy
               python3Packages.build
               python3Packages.twine
               python3Packages.virtualenv
@@ -46,15 +47,16 @@
             shellHook = ''
               echo "You can now run: subscriptions-to-csv"
               echo "Run tests with:  pytest"
+              echo "Run type checking with: mypy subscriptions_to_csv/"
 
               # Set up Python virtual environment with python-semantic-release
               if [ ! -d .venv ]; then
                 echo "Creating virtual environment..."
                 python -m venv .venv
-                echo "Activating virtual environment and installing python-semantic-release..."
+                echo "Activating virtual environment and installing development tools..."
                 source .venv/bin/activate
-                pip install python-semantic-release
-                echo "Virtual environment ready with python-semantic-release installed."
+                pip install python-semantic-release mypy
+                echo "Virtual environment ready with python-semantic-release and mypy installed."
               else
                 echo "Activating existing virtual environment..."
                 source .venv/bin/activate

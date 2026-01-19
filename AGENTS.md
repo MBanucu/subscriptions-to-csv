@@ -146,6 +146,7 @@ write_csv_file(parsed, "output.csv")
 - **Build the flake**: `nix build`
 - **Run the application**: `nix run .#subscriptions-to-csv`
 - **Enter development shell**: `nix develop` (or use direnv for automatic loading)
+- **Run type checking**: `mypy subscriptions_to_csv/` (in devShell)
 - **Check flake validity**: `nix flake check`
 - **Update flake inputs**: `nix flake update`
 - **Show flake outputs**: `nix flake show`
