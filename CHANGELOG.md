@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.7.3 (2026-01-19)
+
+## [1.7.3](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.7.2...v1.7.3) (2026-01-19)
+
+
+### Bug Fixes
+
+* replace GH_TOKEN PAT with default GITHUB_TOKEN in release workflow ([50fb6b9](https://github.com/MBanucu/subscriptions-to-csv/commit/50fb6b9abade576f12391b3e9afdfca2f162f502))
+* use PAT for PR creation step in release workflow ([1ff5f02](https://github.com/MBanucu/subscriptions-to-csv/commit/1ff5f026e365337a083eae62a09ff1ae1570679e))
+
+
+
+
+
+# Changelog
+
 ## 1.7.2 (2026-01-19)
 
 ## [1.7.2](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.7.1...v1.7.2) (2026-01-19)
