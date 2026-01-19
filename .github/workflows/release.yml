@@ -78,29 +78,6 @@ jobs:
         changelog: true
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Check if PR already exists (if release branch created)
-      id: check-pr
-      if: steps.create-branch.outputs.branch_name != ''
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        BRANCH="${{ steps.create-branch.outputs.branch_name }}"
-        EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq 'length')
-        echo "pr_exists=$EXISTING_PR" >> $GITHUB_OUTPUT
-        if [ "$EXISTING_PR" -gt 0 ]; then
-          PR_NUMBER=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
-          echo "existing_pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Close existing PR (if PR exists)
-      if: steps.check-pr.outputs.pr_exists != '0'
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        PR_NUMBER=${{ steps.check-pr.outputs.existing_pr_number }}
-        echo "Closing existing PR #$PR_NUMBER to ensure fresh CI triggering..."
-        gh pr close $PR_NUMBER --comment "Closed to create fresh PR with proper CI triggering"
-
     - name: Create pull request (always create fresh PR)
       id: create-pr
       if: steps.create-branch.outputs.branch_name != ''
