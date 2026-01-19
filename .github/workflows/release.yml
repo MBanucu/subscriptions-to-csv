@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_branch: ${{ steps.create-branch.outputs.branch_name }}
-      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
-      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
-      new_release_notes: ${{ steps.semantic.outputs.new_release_notes }}
+      released: ${{ steps.release.outputs.released }}
+      version: ${{ steps.release.outputs.version }}
+      changelog: ${{ steps.release.outputs.changelog }}
     permissions:
       contents: write
       issues: write
@@ -29,60 +29,27 @@ jobs:
       with:
         fetch-depth: 0  # Important for semantic-release to analyze all commits
 
-    - name: Semantic Release (Dry Run)
-      uses: cycjimmy/semantic-release-action@v6
-      id: semantic
+    - name: Determine next version (Dry Run)
+      uses: python-semantic-release/python-semantic-release@v9
+      id: release
       with:
-        semantic_version: 25.0.2
-        dry_run: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        root_options: --noop
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create release branch (if release needed)
       id: create-branch
-      if: steps.semantic.outputs.new_release_published == 'true'
+      if: steps.release.outputs.released == 'true'
       run: |
-        BRANCH_NAME="release/v${{ steps.semantic.outputs.new_release_version }}"
+        BRANCH_NAME="release/v${{ steps.release.outputs.version }}"
         git checkout -b "$BRANCH_NAME"
         echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-    - name: Update version files (if release branch created)
+    - name: Update version and create release (if release branch created)
       if: steps.create-branch.outputs.branch_name != ''
-      run: |
-        # Update version in pyproject.toml
-        sed -i "s/version = \".*\"/version = \"${{ steps.semantic.outputs.new_release_version }}\"/" pyproject.toml
-        # Update version in __init__.py
-        sed -i "s/__version__ = \".*\"/__version__ = \"${{ steps.semantic.outputs.new_release_version }}\"/" subscriptions_to_csv/__init__.py
-        # Update version in flake.nix
-        sed -i "s/version = \".*\";/version = \"${{ steps.semantic.outputs.new_release_version }}\";/" flake.nix
-
-    - name: Update changelog (if release branch created)
-      if: steps.create-branch.outputs.branch_name != ''
-      run: |
-        # Generate changelog using semantic-release dry run results
-        echo "# Changelog" > temp_changelog.md
-        echo "" >> temp_changelog.md
-        echo "## ${{ steps.semantic.outputs.new_release_version }} ($(date +%Y-%m-%d))" >> temp_changelog.md
-        echo "" >> temp_changelog.md
-        # Add release notes from semantic release
-        if [ -n "${{ steps.semantic.outputs.new_release_notes }}" ]; then
-          echo "${{ steps.semantic.outputs.new_release_notes }}" >> temp_changelog.md
-        fi
-        echo "" >> temp_changelog.md
-
-        # Prepend to existing CHANGELOG.md
-        if [ -f CHANGELOG.md ]; then
-          cat CHANGELOG.md >> temp_changelog.md
-        fi
-        mv temp_changelog.md CHANGELOG.md
-
-    - name: Commit changes (if release branch created)
-      if: steps.create-branch.outputs.branch_name != ''
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add pyproject.toml subscriptions_to_csv/__init__.py flake.nix CHANGELOG.md
-        git commit -m "chore(release): ${{ steps.semantic.outputs.new_release_version }}"
+      uses: python-semantic-release/python-semantic-release@v9
+      with:
+        root_options: --no-push --no-vcs-release --no-pypi-publish
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push release branch (if created)
       if: steps.create-branch.outputs.branch_name != ''
@@ -120,27 +87,27 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-         TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
-         BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
+        TITLE="chore(release): ${{ steps.release.outputs.version }}"
+        BODY="Automated release ${{ steps.release.outputs.version }}
 
-         ## Changes
-         ${{ steps.semantic.outputs.new_release_notes }}
+        ## Changes
+        ${{ steps.release.outputs.changelog }}
 
-         ---
-         🤖 This PR was automatically created by the release workflow."
+        ---
+        🤖 This PR was automatically created by the release workflow."
 
-           # Create the PR and capture the URL
-           PR_URL=$(echo "$BODY" | gh pr create \
-             --title "$TITLE" \
-             --body-file - \
-             --base main \
-             --head "${{ steps.create-branch.outputs.branch_name }}")
+        # Create the PR and capture the URL
+        PR_URL=$(echo "$BODY" | gh pr create \
+          --title "$TITLE" \
+          --body-file - \
+          --base main \
+          --head "${{ steps.create-branch.outputs.branch_name }}")
 
-           # Extract PR number from URL (format: https://github.com/owner/repo/pull/123)
-           PR_NUMBER=$(echo "$PR_URL" | grep -o '[0-9]\+$')
+        # Extract PR number from URL (format: https://github.com/owner/repo/pull/123)
+        PR_NUMBER=$(echo "$PR_URL" | grep -o '[0-9]\+$')
 
-           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-           echo "✅ Release PR #$PR_NUMBER created: $PR_URL"
+        echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        echo "✅ Release PR #$PR_NUMBER created: $PR_URL"
 
     - name: Enable auto-merge for release PR
       if: steps.create-branch.outputs.branch_name != ''
@@ -207,7 +174,7 @@ jobs:
 
   publish:
     needs: release
-    if: needs.release.outputs.new_release_published == 'true'
+    if: needs.release.outputs.released == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write  # For creating GitHub releases
@@ -244,12 +211,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        echo "Creating GitHub release v${{ needs.release.outputs.new_release_version }}..."
+        echo "Creating GitHub release v${{ needs.release.outputs.version }}..."
 
         # Create the release with generated notes
-        gh release create v${{ needs.release.outputs.new_release_version }} \
-          --title "Release v${{ needs.release.outputs.new_release_version }}" \
-          --notes "${{ needs.release.outputs.new_release_notes }}"
+        gh release create v${{ needs.release.outputs.version }} \
+          --title "Release v${{ needs.release.outputs.version }}" \
+          --notes "${{ needs.release.outputs.changelog }}"
 
         echo "✅ GitHub release created successfully"
 

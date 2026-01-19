@@ -45,3 +45,11 @@ subscriptions-to-csv = "subscriptions_to_csv.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["subscriptions_to_csv*"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+version_variables = [
+    "subscriptions_to_csv/__init__.py:__version__",
+    "flake.nix:version = \"{{version}}\";"
+]
+build_command = "python -m build --sdist --wheel ."
