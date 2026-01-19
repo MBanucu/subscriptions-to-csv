@@ -1,4 +1,7 @@
-"""Convert subscription lists to CSV with EUR conversion."""
+"""Convert subscription lists to CSV with EUR conversion.
+
+Dry run test on release branch.
+"""
 
 import json
 import urllib.request
