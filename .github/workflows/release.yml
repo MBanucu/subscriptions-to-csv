@@ -166,8 +166,8 @@ jobs:
         PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
         echo "Waiting for PR #$PR_NUMBER to be merged..."
         while true; do
-          MERGED=$(gh pr view $PR_NUMBER --json merged --jq .merged)
-          if [ "$MERGED" = "true" ]; then
+          MERGED_AT=$(gh pr view $PR_NUMBER --json mergedAt --jq .mergedAt)
+          if [ "$MERGED_AT" != "null" ]; then
             echo "PR #$PR_NUMBER has been merged!"
             break
           fi
