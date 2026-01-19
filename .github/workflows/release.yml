@@ -118,7 +118,7 @@ jobs:
       id: create-pr
       if: steps.create-branch.outputs.branch_name != ''
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
          TITLE="chore(release): ${{ steps.semantic.outputs.new_release_version }}"
          BODY="Automated release ${{ steps.semantic.outputs.new_release_version }}
