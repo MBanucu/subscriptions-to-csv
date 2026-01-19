@@ -49,8 +49,7 @@ include = ["subscriptions_to_csv*"]
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 version_variables = [
-    "subscriptions_to_csv/__init__.py:__version__",
-    "flake.nix:version = \"{{version}}\""
+    "subscriptions_to_csv/__init__.py:__version__"
 ]
 
 [tool.semantic_release.branches.main]
