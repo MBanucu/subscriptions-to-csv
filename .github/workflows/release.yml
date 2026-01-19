@@ -165,6 +165,19 @@ jobs:
       run: |
         PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
         echo "Waiting for PR #$PR_NUMBER to be merged..."
+
+        # Wait for checks to be reported (timeout 10s)
+        counter=0
+        while [ $counter -lt 10 ]; do
+          if gh pr checks $PR_NUMBER | grep -q "pass\|fail\|pending"; then
+            echo "Checks reported for PR #$PR_NUMBER"
+            break
+          fi
+          echo "Waiting for checks to be reported..."
+          sleep 1
+          counter=$((counter + 1))
+        done
+
         gh pr checks $PR_NUMBER --watch
         while true; do
           MERGED_AT=$(gh pr view $PR_NUMBER --json mergedAt --jq .mergedAt)
