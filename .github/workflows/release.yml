@@ -147,7 +147,7 @@ jobs:
     - name: Enable auto-merge for release PR
       if: steps.create-branch.outputs.branch_name != ''
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         PR_NUMBER=${{ steps.create-pr.outputs.pr_number }}
 
