@@ -35,6 +35,7 @@
               python3Packages.pytest
               python3Packages.build
               python3Packages.twine
+              python3Packages.virtualenv
               self.packages.${system}.subscriptions-to-csv
             ];
             nativeBuildInputs = with pkgs; [
@@ -45,6 +46,20 @@
             shellHook = ''
               echo "You can now run: subscriptions-to-csv"
               echo "Run tests with:  pytest"
+
+              # Set up Python virtual environment with python-semantic-release
+              if [ ! -d .venv ]; then
+                echo "Creating virtual environment..."
+                python -m venv .venv
+                echo "Activating virtual environment and installing python-semantic-release..."
+                source .venv/bin/activate
+                pip install python-semantic-release
+                echo "Virtual environment ready with python-semantic-release installed."
+              else
+                echo "Activating existing virtual environment..."
+                source .venv/bin/activate
+                echo "Virtual environment ready."
+              fi
             '';
           };
         }
