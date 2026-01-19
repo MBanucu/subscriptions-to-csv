@@ -54,7 +54,7 @@ jobs:
       if: steps.create-branch.outputs.branch_name != ''
       run: |
         # Update version in pyproject.toml
-        sed -i "s/version = \".*\"/version = \"${{ steps.semantic.outputs.new_release_version }}\"/" pyproject.toml
+        sed -i "s/version = .*/version = \"${{ steps.semantic.outputs.new_release_version }}\"/" pyproject.toml
         # Update version in __init__.py
         sed -i "s/__version__ = \".*\"/__version__ = \"${{ steps.semantic.outputs.new_release_version }}\"/" subscriptions_to_csv/__init__.py
         # Update version in flake.nix
