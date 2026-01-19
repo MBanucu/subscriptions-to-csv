@@ -67,22 +67,15 @@ jobs:
         git checkout -b "$BRANCH_NAME"
         echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-    - name: Update version and create release (if release branch created)
+    - name: Update version, create release, and push (if release branch created)
       if: steps.create-branch.outputs.branch_name != ''
       uses: python-semantic-release/python-semantic-release@v10
       with:
-        push: false
+        push: true
         vcs_release: false
         commit: true
         changelog: true
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Push release branch (if created)
-      if: steps.create-branch.outputs.branch_name != ''
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        git push --force origin "${{ steps.create-branch.outputs.branch_name }}"
 
     - name: Check if PR already exists (if release branch created)
       id: check-pr
