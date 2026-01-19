@@ -14,7 +14,7 @@ from .converter import (
     ExchangeRateError,
 )
 
-__version__ = "1.8.2"
+__version__ = "2.0.0"
 __all__ = [
     "convert_subscriptions",
     "fetch_exchange_rate",
