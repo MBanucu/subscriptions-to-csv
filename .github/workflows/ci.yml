@@ -65,19 +65,27 @@ jobs:
       - name: Run mypy
         run: mypy subscriptions_to_csv/
 
-  # Summary job that depends on all matrix jobs
+  # Summary job that depends on all quality checks
   ci-success:
     if: always()
     runs-on: ubuntu-latest
     needs: [test, mypy]
     steps:
-      - name: Check matrix test results
+      - name: Check all quality checks
         run: |
-          if [[ ${{ needs.test.result }} == 'success' ]]; then
-            echo "✅ All matrix tests passed!"
-            echo "status=success" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Some matrix tests failed"
+          # Check test results
+          if [[ ${{ needs.test.result }} != 'success' ]]; then
+            echo "❌ Test job failed"
             echo "status=failed" >> $GITHUB_OUTPUT
             exit 1
-           fi
+          fi
+
+          # Check mypy results
+          if [[ ${{ needs.mypy.result }} != 'success' ]]; then
+            echo "❌ MyPy type checking failed"
+            echo "status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "✅ All quality checks passed!"
+          echo "status=success" >> $GITHUB_OUTPUT
