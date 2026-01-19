@@ -6,7 +6,7 @@ from pathlib import Path
 from .converter import convert_subscriptions, ExchangeRateError, SubscriptionParseError
 
 
-def parse_arguments():
+def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description='Convert subscription list to CSV with EUR conversion',
@@ -45,7 +45,7 @@ Examples:
     return args
 
 
-def print_summary(output_file: str, subscriptions: list, total_eur: float):
+def print_summary(output_file: str, subscriptions: list, total_eur: float) -> None:
     """Print summary of the conversion."""
     print(f'Created {output_file}')
     print('First few lines:')
@@ -61,7 +61,7 @@ def print_summary(output_file: str, subscriptions: list, total_eur: float):
     print(f'Total in EUR: {total_eur:.2f}')
 
 
-def main():
+def main() -> None:
     """Main function to run the subscription converter CLI."""
     args = parse_arguments()
 
