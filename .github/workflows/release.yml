@@ -43,6 +43,7 @@ jobs:
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
         BRANCH_NAME="release/${{ steps.release.outputs.tag }}-$TIMESTAMP"
         git checkout -b "$BRANCH_NAME"
+        git push -u origin "$BRANCH_NAME"
         echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
     - name: Update version, create release, and push (if release branch created)
