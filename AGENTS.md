@@ -496,7 +496,7 @@ For complex changes that result in multiple incremental commits (fixes, document
 
 #### Automated Release Management
 
-The project uses **semantic-release v25.0.2** with **cycjimmy/semantic-release-action v6.0.0** for automated versioning and publishing based on conventional commit messages.
+The project uses **python-semantic-release** for automated versioning and publishing based on conventional commit messages.
 
 **Workflow**:
 1. **Commit with conventional format**: Use `feat:`, `fix:`, `docs:`, etc.
@@ -527,9 +527,9 @@ gh release create v1.2.3 --generate-notes
 ```
 
 **Configuration**:
-- `.github/workflows/release.yml`: GitHub Actions workflow (v6.0.0)
-- `.releaserc.json`: Semantic release configuration
-- Uses semantic-release v25.0.2 (latest stable)
+- `.github/workflows/release.yml`: GitHub Actions workflow
+- `pyproject.toml`: python-semantic-release configuration
+- Uses python-semantic-release (latest stable)
 - Follows conventional commits specification v1.0.0
 
 **Monitoring CI/CD Pipeline**:
