@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.5.1 (2026-01-19)
+
+## [1.5.1](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.5.0...v1.5.1) (2026-01-19)
+
+
+### Bug Fixes
+
+* remove test workflow file ([ee3dabf](https://github.com/MBanucu/subscriptions-to-csv/commit/ee3dabf0a7c8c1c80683dd3d3b7ad117b85632fb))
+
+
+
+
+
+# Changelog
+
 ## 1.5.0 (2026-01-19)
 
 # [1.5.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.4.0...v1.5.0) (2026-01-19)
