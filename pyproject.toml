@@ -52,7 +52,6 @@ version_variables = [
     "subscriptions_to_csv/__init__.py:__version__",
     "flake.nix:version = \"{{version}}\";"
 ]
-build_command = "python -m build --sdist --wheel ."
 
 [tool.semantic_release.branches.main]
 match = "main"
