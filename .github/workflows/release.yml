@@ -17,6 +17,7 @@ jobs:
       released: ${{ steps.release.outputs.released }}
       version: ${{ steps.release.outputs.version }}
       changelog: ${{ steps.release.outputs.changelog }}
+      has_release_commits: ${{ steps.check-commits.outputs.has_release_commits }}
     permissions:
       contents: write
       issues: write
@@ -29,7 +30,29 @@ jobs:
       with:
         fetch-depth: 0  # Important for semantic-release to analyze all commits
 
+    - name: Check for release-worthy commits
+      id: check-commits
+      run: |
+        # Check if there are conventional commits since last release
+        LAST_RELEASE=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [ -z "$LAST_RELEASE" ]; then
+          # No releases yet, check all commits
+          RELEASE_COMMITS=$(git log --oneline --grep="^feat:\|^fix:\|BREAKING" | wc -l)
+        else
+          # Check commits since last release
+          RELEASE_COMMITS=$(git log "${LAST_RELEASE}..HEAD" --oneline --grep="^feat:\|^fix:\|BREAKING" | wc -l)
+        fi
+
+        if [ "$RELEASE_COMMITS" -gt 0 ]; then
+          echo "has_release_commits=true" >> $GITHUB_OUTPUT
+          echo "Found $RELEASE_COMMITS release-worthy commits"
+        else
+          echo "has_release_commits=false" >> $GITHUB_OUTPUT
+          echo "No release-worthy commits found"
+        fi
+
     - name: Determine next version (Dry Run)
+      if: steps.check-commits.outputs.has_release_commits == 'true'
       uses: python-semantic-release/python-semantic-release@v10
       id: release
       with:
@@ -38,7 +61,7 @@ jobs:
 
     - name: Create release branch (if release needed)
       id: create-branch
-      if: steps.release.outputs.released == 'true'
+      if: steps.check-commits.outputs.has_release_commits == 'true' && steps.release.outputs.released == 'true'
       run: |
         BRANCH_NAME="release/v${{ steps.release.outputs.version }}"
         git checkout -b "$BRANCH_NAME"
@@ -183,7 +206,7 @@ jobs:
 
   publish:
     needs: release
-    if: needs.release.outputs.released == 'true'
+    if: needs.release.outputs.released == 'true' && needs.release.outputs.has_release_commits == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write  # For creating GitHub releases
