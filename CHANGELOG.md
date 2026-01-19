@@ -5,6 +5,32 @@
 # [1.6.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.5.2...v1.6.0) (2026-01-19)
 
 
+### Bug Fixes
+
+* ensure publish job has latest version after PR merge ([c715c24](https://github.com/MBanucu/subscriptions-to-csv/commit/c715c24313d6e69aecc59b0126404cf2799d8a74))
+* update pyproject.toml version sed to handle single quotes ([94cc519](https://github.com/MBanucu/subscriptions-to-csv/commit/94cc5190029cfade42f027fe2588a83dd18e503c))
+
+
+### Features
+
+* improve release workflow with PR checks watch ([fd4854a](https://github.com/MBanucu/subscriptions-to-csv/commit/fd4854a5a3a57ffc54205e8004120bc3a8adf15f))
+
+
+### Reverts
+
+* restore original pyproject.toml sed command ([c0d7e8d](https://github.com/MBanucu/subscriptions-to-csv/commit/c0d7e8df432eb2cfadf754a2b9a9f5f6a393f6fb))
+
+
+
+
+
+# Changelog
+
+## 1.6.0 (2026-01-19)
+
+# [1.6.0](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.5.2...v1.6.0) (2026-01-19)
+
+
 ### Features
 
 * improve release workflow with PR checks watch ([fd4854a](https://github.com/MBanucu/subscriptions-to-csv/commit/fd4854a5a3a57ffc54205e8004120bc3a8adf15f))
