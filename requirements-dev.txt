@@ -1,0 +1,6 @@
+# Auto-generated from pyproject.toml optional-dependencies.dev
+# Do not edit manually
+
+mypy>=1.0.0
+pytest-cov>=4.0.0
+pytest>=7.0.0
