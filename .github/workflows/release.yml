@@ -33,7 +33,7 @@ jobs:
       uses: python-semantic-release/python-semantic-release@v10
       id: release
       with:
-        root_options: --noop
+        no_operation_mode: true
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create release branch (if release needed)
@@ -48,7 +48,8 @@ jobs:
       if: steps.create-branch.outputs.branch_name != ''
       uses: python-semantic-release/python-semantic-release@v10
       with:
-        root_options: --no-push --no-vcs-release --no-pypi-publish
+        push: false
+        vcs_release: false
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push release branch (if created)
