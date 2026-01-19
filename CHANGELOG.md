@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.7.2 (2026-01-19)
+
+## [1.7.2](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.7.1...v1.7.2) (2026-01-19)
+
+
+### Bug Fixes
+
+* clean up release workflow triggers and conditions ([32026f2](https://github.com/MBanucu/subscriptions-to-csv/commit/32026f2dba3667b05f8b76f4c9e32a6ae562e8d8))
+
+
+
+
+
+# Changelog
+
 ## 1.7.1 (2026-01-19)
 
 ## [1.7.1](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.7.0...v1.7.1) (2026-01-19)
