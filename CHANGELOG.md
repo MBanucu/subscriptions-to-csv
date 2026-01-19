@@ -7,6 +7,22 @@
 
 ### Bug Fixes
 
+* add PR merge fallback trigger to publish workflow ([a3d2ee5](https://github.com/MBanucu/subscriptions-to-csv/commit/a3d2ee5c64043a0cce436ceffae5109f92fa81f7))
+* use default GITHUB_TOKEN for auto-merge operations ([6173d60](https://github.com/MBanucu/subscriptions-to-csv/commit/6173d60a44a84d0d477d8b9272ca8234347ba0db))
+
+
+
+
+
+# Changelog
+
+## 1.5.2 (2026-01-19)
+
+## [1.5.2](https://github.com/MBanucu/subscriptions-to-csv/compare/v1.5.1...v1.5.2) (2026-01-19)
+
+
+### Bug Fixes
+
 * use default GITHUB_TOKEN for auto-merge operations ([6173d60](https://github.com/MBanucu/subscriptions-to-csv/commit/6173d60a44a84d0d477d8b9272ca8234347ba0db))
 
 
