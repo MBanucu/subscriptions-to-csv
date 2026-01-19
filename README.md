@@ -308,10 +308,10 @@ git push origin main
 ```
 
 **Tools Used**:
-- **semantic-release**: v25.0.2 (latest stable)
-- **GitHub Action**: cycjimmy/semantic-release-action v6.0.0
-- **Node.js**: 24+ compatible
-- **Plugins**: changelog, git (optimized for Python projects)
+- **python-semantic-release**: Latest stable version
+- **GitHub Action**: python-semantic-release/python-semantic-release
+- **Python**: 3.6+ compatible
+- **Configuration**: pyproject.toml based (no plugins needed)
 
 ### Code Style
 
@@ -319,7 +319,7 @@ See AGENTS.md for detailed coding guidelines.
 
 ## Releases
 
-This project uses automated semantic versioning and publishing with **semantic-release v25.0.2** and **cycjimmy/semantic-release-action v6.0.0**:
+This project uses automated semantic versioning and publishing with **python-semantic-release**:
 
 🎉 **Fully automated release system now active!**
 
