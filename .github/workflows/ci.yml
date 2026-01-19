@@ -58,14 +58,4 @@ jobs:
             echo "❌ Some matrix tests failed"
             echo "status=failed" >> $GITHUB_OUTPUT
             exit 1
-          fi
-
-      - name: CI Success
-        if: needs.test.result == 'success'
-        run: echo "🎉 CI pipeline completed successfully across all Python versions!"
-
-      - name: CI Failed
-        if: needs.test.result != 'success'
-        run: |
-          echo "💥 CI pipeline failed. Check individual job logs for details."
-          exit 1
+           fi
