@@ -54,6 +54,12 @@ jobs:
         changelog: true
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Update flake.nix version (if release branch created)
+      if: steps.create-branch.outputs.branch_name != ''
+      run: |
+        # Update flake.nix with the new version
+        bash scripts/update-flake-version.sh
+
     - name: Push release branch (if created)
       if: steps.create-branch.outputs.branch_name != ''
       env:
