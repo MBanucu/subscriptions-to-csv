@@ -174,30 +174,22 @@ The flake includes automated CLI integration tests that verify the `nix run` com
 
 Flake checks ensure CLI functionality documented in README.md actually works and prevent regressions.
 
-#### Test Coverage
+### Code Quality
 
-The test suite includes:
-- **Argument parsing**: Default, positional, and optional arguments
-- **Exchange rate API**: Successful fetching and fallback behavior
-- **Data parsing**: EUR/USD currency conversion, multiple subscriptions, error handling
-- **CSV generation**: File output, headers, and total calculations
-- **Integration tests**: Full workflow from input to output
+The project uses mypy for static type checking to ensure type safety and catch potential runtime errors.
 
-#### Manual Testing
+#### Type Checking
 
-For additional manual verification:
+- **Run mypy**: `mypy subscriptions_to_csv/` (in devShell)
+- **Configuration**: `mypy.ini` with strict type checking settings
+- **CI Integration**: Runs automatically on all pull requests and main branch pushes
+- **Python Version**: Checks against Python 3.8+ type annotations
 
-- Run the command: `nix run .#subscriptions-to-csv`
-- Verify output CSV is created correctly
-- Check that EUR conversions use current exchange rates
-- Confirm total sum is calculated accurately
-- Test CLI options: `nix run .#subscriptions-to-csv --help` should display usage information
-
-For manual testing of specific scenarios:
-- Test with different input files: `nix run .#subscriptions-to-csv ./custom-subscriptions.txt`
-- Test output to different file: `nix run .#subscriptions-to-csv subscriptions.txt output.csv`
-- Test options: `nix run .#subscriptions-to-csv --input input.txt --output output.csv`
-- Test remote execution: `nix run github:MBanucu/subscriptions-to-csv#subscriptions-to-csv --input ~/path/to/file.txt`
+Mypy configuration enforces:
+- All functions must have type annotations
+- No implicit Optional types
+- Strict equality checks
+- Comprehensive error reporting
 
 ### Linting
 

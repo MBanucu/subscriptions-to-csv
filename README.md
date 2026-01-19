@@ -310,6 +310,7 @@ git push origin main
 **Tools Used**:
 - **python-semantic-release**: Latest stable version
 - **GitHub Action**: python-semantic-release/python-semantic-release
+- **MyPy**: Static type checking (latest stable)
 - **Python**: 3.6+ compatible
 - **Configuration**: pyproject.toml based (no plugins needed)
 
